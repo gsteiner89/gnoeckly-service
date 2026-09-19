@@ -1,0 +1,257 @@
+@use '@angular/material' as mat;
+
+// Nocturne-Redesign: eigene Tokens sind die Quelle der Farben. mat.theme bleibt nur fuer
+// Bottom-Sheet, Snackbar und Form-Fields; dessen --mat-sys-* werden unten auf die Tokens gemappt.
+html {
+  color-scheme: dark light;
+  @include mat.theme((
+    color: (
+      primary: mat.$violet-palette,
+      tertiary: mat.$orange-palette,
+    ),
+    typography: Inter,
+    density: 0,
+  ));
+}
+
+:root {
+  --color-bg: #161826;
+  --color-surface: #232532;
+  --color-text: #e9e9ed;
+  --color-accent: #9184d9; // nur fuer Linien, Icons, Rahmen, grosse Zahlen – nicht fuer Fliesstext
+  --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
+  --color-muted: color-mix(in srgb, var(--color-text) 55%, transparent);
+  --color-card-header: color-mix(in srgb, var(--color-surface) 45%, var(--color-bg));
+
+  --color-neutral-100: #f3f5fe; --color-neutral-200: #e4e7f5; --color-neutral-300: #cfd3e5;
+  --color-neutral-400: #b2b6ca; --color-neutral-500: #9397ab; --color-neutral-600: #75798c;
+  --color-neutral-700: #595d6c; --color-neutral-800: #3f424d; --color-neutral-900: #292b31;
+  --color-accent-100: #f5f4ff; --color-accent-200: #e7e5fe; --color-accent-300: #d2cefd;
+  --color-accent-400: #b5abfc; --color-accent-500: #968ae0; --color-accent-600: #796cbf;
+  --color-accent-700: #5d5294; --color-accent-800: #423a6a; --color-accent-900: #2b2741;
+
+  --gn-radius: 8px;
+  --gn-shadow-overlay: 0 0 0 1px #595d6c, 0 6px 18px rgba(0, 0, 0, .55);
+  --gn-shadow-boost: 0 0 0 1px var(--color-accent), 0 0 22px color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --gn-fade-line: linear-gradient(to right, transparent, var(--color-divider) 48px, var(--color-divider) calc(100% - 48px), transparent);
+
+  --gn-nav-height: 64px;
+  --gn-header-height: 52px;
+  --gn-safe-top: env(safe-area-inset-top, 0px);
+  --gn-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --gn-gutter: 16px;
+}
+
+@mixin light-tokens {
+  color-scheme: light;
+  --color-bg: #e4e7f5; --color-surface: #f3f5fe; --color-text: #292b31; --color-accent: #796cbf;
+  --color-divider: color-mix(in srgb, #292b31 16%, transparent);
+  --color-accent-300: #5d5294; --color-accent-800: #e7e5fe; --color-accent-100: #2b2741; --color-accent-900: #d2cefd;
+  --color-neutral-900: #cfd3e5; --color-neutral-800: #b2b6ca; --color-neutral-100: #292b31;
+  --gn-shadow-overlay: 0 0 0 1px #b2b6ca, 0 6px 18px rgba(41, 43, 49, .25);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) { @include light-tokens; }
+}
+:root[data-theme='light'] { @include light-tokens; }
+:root[data-theme='dark'] { color-scheme: dark; }
+
+// Material-System-Variablen auf Nocturne mappen, damit Sheets/Snackbar/Form-Fields und noch nicht
+// migrierte Screens im gleichen Look erscheinen.
+:root {
+  --mat-sys-surface: var(--color-bg);
+  --mat-sys-background: var(--color-bg);
+  --mat-sys-on-surface: var(--color-text);
+  --mat-sys-on-background: var(--color-text);
+  --mat-sys-on-surface-variant: var(--color-muted);
+  --mat-sys-surface-container-lowest: var(--color-bg);
+  --mat-sys-surface-container-low: var(--color-surface);
+  --mat-sys-surface-container: var(--color-surface);
+  --mat-sys-surface-container-high: var(--color-neutral-900);
+  --mat-sys-surface-container-highest: var(--color-neutral-900);
+  --mat-sys-primary: var(--color-accent);
+  --mat-sys-on-primary: var(--color-bg);
+  --mat-sys-primary-container: var(--color-accent-800);
+  --mat-sys-on-primary-container: var(--color-accent-100);
+  --mat-sys-secondary: var(--color-accent);
+  --mat-sys-secondary-container: var(--color-accent-800);
+  --mat-sys-on-secondary-container: var(--color-accent-100);
+  --mat-sys-tertiary: var(--color-accent);
+  --mat-sys-tertiary-container: var(--color-accent-800);
+  --mat-sys-on-tertiary-container: var(--color-accent-100);
+  --mat-sys-error-container: var(--color-neutral-800);
+  --mat-sys-on-error-container: var(--color-neutral-100);
+  --mat-sys-outline: var(--color-neutral-600);
+  --mat-sys-outline-variant: var(--color-divider);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+// Top-App-Bar mit Safe-Area (Notch/Statusleiste)
+.gn-appbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--gn-header-height);
+  padding: var(--gn-safe-top) 4px 0 4px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.gn-appbar__title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 500;
+  padding-left: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Seitenlayout: eine Spalte, Gutter 16, Platz fuer Bottom-Nav (84 px inkl. Luft) + Safe-Area.
+.gn-page {
+  padding: var(--gn-gutter);
+  padding-bottom: calc(84px + var(--gn-safe-bottom));
+  max-width: 640px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.gn-page--flush {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.gn-row { display: flex; align-items: center; gap: 8px; }
+.gn-spacer { flex: 1; }
+.gn-muted { color: var(--color-muted); font-size: 12px; }
+.gn-title { font-size: 17px; font-weight: 500; margin: 0; }
+.gn-empty { text-align: center; padding: 48px 16px; color: var(--color-muted); font-size: 14px; }
+
+// Ausblendende 1-px-Trennlinie und Label-Stil
+.gn-fade-line { height: 1px; border: 0; margin: 0; background: var(--gn-fade-line); }
+.gn-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--color-muted); }
+
+.gn-skeleton {
+  border-radius: var(--gn-radius);
+  min-height: 120px;
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-neutral-900) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: gn-shimmer 1.2s infinite;
+}
+
+@keyframes gn-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// Tags: Radius 6, neutral; Varianten outline-accent (Boost), accent-800 (freigegeben), neutral-800 (abgelehnt)
+.gn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: var(--color-neutral-900);
+  color: var(--color-neutral-100);
+}
+.gn-badge--boost { background: transparent; color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.gn-badge--rejected { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+.gn-badge--ok { background: var(--color-accent-800); color: var(--color-accent-100); }
+
+.gn-sheet { padding: 8px 16px calc(16px + var(--gn-safe-bottom)); }
+.gn-sheet__handle { width: 32px; height: 4px; border-radius: 2px; margin: 0 auto 12px; background: var(--color-neutral-700); }
+
+// Snackbar/Toast: neutral-900/100, 13 px, ueber der Nav
+.mat-mdc-snack-bar-container {
+  --mat-snack-bar-container-color: var(--color-neutral-900);
+  --mat-snack-bar-supporting-text-color: var(--color-neutral-100);
+  --mat-snack-bar-supporting-text-size: 13px;
+  margin-bottom: calc(var(--gn-nav-height) + var(--gn-safe-bottom) + 8px) !important;
+}
+
+// Buttons sind immer outlined: Material-Buttons auf Nocturne umthemen.
+.mat-mdc-outlined-button, .mat-mdc-unelevated-button, .mat-mdc-raised-button {
+  --mat-button-outlined-container-shape: var(--gn-radius);
+  --mat-button-filled-container-shape: var(--gn-radius);
+  --mat-button-outlined-label-text-color: var(--color-accent);
+  --mat-button-outlined-outline-color: var(--color-accent);
+  --mat-button-outlined-label-text-weight: 500;
+}
+
+// Eigene Buttons (immer outlined): Standard = Accent-Rand, --secondary = divider-Rand, --ghost = ohne Rand.
+.gn-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 40px; padding: 0 16px; border: 0; border-radius: var(--gn-radius); background: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-accent); color: var(--color-accent);
+  font: inherit; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer;
+  &:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+  &:active:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+  &:disabled { opacity: .45; cursor: default; }
+  &--secondary { box-shadow: inset 0 0 0 1px var(--color-divider); }
+  &--ghost { box-shadow: none; }
+  &--sm { height: 32px; padding: 0 12px; font-size: 12px; }
+  &--lg { height: 44px; }
+  &--block { display: flex; width: 100%; height: 46px; }
+}
+
+// Segment-Control (Rand divider, aktiv: accent-Text + inset-Rand) und Tabs (nur untere Linie)
+.gn-segment {
+  display: inline-flex; height: 36px; border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider);
+  button {
+    display: inline-flex; align-items: center; gap: 4px; padding: 0 10px; border: 0; border-radius: var(--gn-radius);
+    background: none; color: var(--color-muted); font: inherit; font-size: 13px; cursor: pointer;
+    &.on { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+  }
+  &--sm { height: 32px; }
+}
+// Formularfelder: Label 12 px (70 % Text), Input 44 px Surface mit divider-Rand, Fokus accent
+.gn-field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
+.gn-input {
+  box-sizing: border-box; width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--color-divider);
+  border-radius: var(--gn-radius); background: var(--color-surface); color: var(--color-text);
+  font: inherit; font-size: 15px;
+  &:focus { outline: none; border-color: var(--color-accent); }
+  &--compact { height: 40px; }
+}
+textarea.gn-input { height: auto; padding: 10px 12px; resize: vertical; font-size: 17px; line-height: 1.6; }
+.gn-auth { max-width: 640px; margin: 0 auto; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px; }
+.gn-auth__bar { width: 32px; height: 2px; background: var(--color-accent); }
+.gn-auth h1 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.gn-auth__sub { margin: -6px 0 6px; font-size: 14px; color: var(--color-muted); }
+.gn-auth__link { margin: 4px 0 0; font-size: 14px; color: var(--color-muted); a { color: var(--color-accent-300); text-decoration: none; } }
+
+.gn-tabs {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  button {
+    height: 40px; border: 0; background: none; border-bottom: 1px solid var(--color-divider);
+    color: var(--color-muted); font: inherit; font-size: 14px; cursor: pointer;
+    &.on { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+  }
+}
+
+// Icon-Button 40 px (Header: Zurueck, Profil bearbeiten, Abmelden)
+.gn-icon-btn {
+  display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--gn-radius);
+  background: none; color: var(--color-text); cursor: pointer;
+  &:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+  &:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+  mat-icon { width: 22px; height: 22px; font-size: 22px; }
+}

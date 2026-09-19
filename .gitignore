@@ -1,0 +1,25 @@
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.idea/
+*.iml
+out/
+.vscode/
+.env
+*.keystore
+*.jks
+data/
+gnoeckly-web/node_modules/
+gnoeckly-web/dist/
+gnoeckly-web/.angular/
+gnoeckly-web/android/app/build/
+gnoeckly-web/android/.gradle/
+gnoeckly-web/android/build/
+gnoeckly-web/android/local.properties
+gnoeckly-web/ios/App/Pods/
+gnoeckly-web/ios/App/build/
+gnoeckly-web/ios/App/App.xcworkspace/xcuserdata/
+
+# AdMob-SSV-Testschluessel (docs/admob-ssv-lokal.md)
+tools/ssv-private.key
+src/main/resources/admob-test-keys.json

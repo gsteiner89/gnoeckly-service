@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-5f8038d9-f2ff-4e20-94ef-bdba0dbf75af/styles.css">
+<script src="_ds/nocturne-5f8038d9-f2ff-4e20-94ef-bdba0dbf75af/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#0f1019;font-family:var(--font-body)}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-300)}
+button{font-family:inherit}
+input,textarea{font-family:inherit}
+[data-theme="light"]{--color-bg:#e4e7f5;--color-surface:#f3f5fe;--color-text:#292b31;--color-accent:#796cbf;--color-divider:color-mix(in srgb,#292b31 16%,transparent);--color-accent-300:#5d5294;--color-accent-800:#e7e5fe;--color-accent-100:#2b2741;--color-accent-900:#d2cefd;--color-neutral-900:#cfd3e5;--color-neutral-800:#b2b6ca;--color-neutral-100:#292b31;--shadow-md:0 0 0 1px #b2b6ca,0 6px 18px rgba(0,0,0,.18)}
+@keyframes gnSheetIn{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes gnFade{from{opacity:0}to{opacity:1}}
+.gn-scroll{scrollbar-width:none}.gn-scroll::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:36px 28px;display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start;justify-content:center;color:#e9e9ed">
+
+  <div style="width:300px;display:flex;flex-direction:column;gap:14px;font-size:13px;line-height:1.55;color:#b2b6ca">
+    <div style="font:600 10px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#75798c">REDESIGN · NOCTURNE · KLICKBAR</div>
+    <div style="font:500 22px/1.2 Inter,system-ui,sans-serif;color:#e9e9ed">Gnöckly, neu</div>
+    <div><b style="color:#e9e9ed;font-weight:500">Der Witz kommt zuerst.</b> Die Karte beginnt mit dem Text (17 px, Zeilenhöhe 1,6). Autor, Zeit und Kategorie rücken als eine leise Zeile darunter, Votes sitzen kompakt rechts.</div>
+    <div><b style="color:#e9e9ed;font-weight:500">Kategorien brauchen eine Zeile, nicht zwei.</b> Sortierung als Segment, Kategorien über einen Filter-Button mit Bottom-Sheet (mehrere kombinierbar); der Zeitraum für „Top“ wandert mit hinein.</div>
+    <div><b style="color:#e9e9ed;font-weight:500">Profil bricht nicht mehr.</b> Statt drei Kacheln ein Zahlen-Streifen; Admin-Aktionen als kleine Ghost-Buttons, die umbrechen dürfen; Sammlung als Kachel-Raster statt Chip-Wolke.</div>
+    <div style="height:1px;background:linear-gradient(to right,transparent,#3f424d 48px,#3f424d calc(100% - 48px),transparent)"></div>
+    <div style="font-size:12px;color:#75798c">Alle Screens sind verbunden: Tabs unten, Karte → Detail, Autor → Profil, Gnöcken → Wallet, Plus → Einreichen. Votes, Favoriten (Lesezeichen, gesammelt unter „Ich“), Kauf, Boost und Sticker-Verleihen sind simuliert. Sticker-Bilder sind Platzhalter, bis echte Assets da sind.</div>
+  </div>
+
+  <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 412 }}" height="{{ 892 }}" dark="{{ true }}" hint-size="412px,892px">
+  <div data-theme="{{ theme }}" style="height:100%;display:flex;flex-direction:column;position:relative;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:15px;line-height:1.5">
+
+    <!-- ══ FEED ══ -->
+    <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Feed" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:8px;height:52px;padding:0 8px 0 16px;flex:none">
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px;letter-spacing:-.01em">Gnöckly</div>
+        <button onClick="{{ goWallet }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13px;font-weight:500;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.coin }}{{ balance }}</button>
+      </header>
+
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 16px 10px;flex:none">
+          <div style="display:inline-flex;flex:none;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;height:36px">
+            <button onClick="{{ sortHot }}" style="display:inline-flex;align-items:center;gap:5px;padding:0 10px;font-size:13px;border:0;background:transparent;color:{{ hotColor }};box-shadow:{{ hotRing }};cursor:pointer">{{ ic.fire }}Heiß</button>
+            <button onClick="{{ sortTop }}" style="display:inline-flex;align-items:center;gap:5px;padding:0 11px;font-size:13px;border:0;border-left:1px solid var(--color-divider);background:transparent;color:{{ topColor }};box-shadow:{{ topRing }};cursor:pointer">{{ ic.trend }}Top</button>
+            <button onClick="{{ sortNew }}" style="display:inline-flex;align-items:center;gap:5px;padding:0 11px;font-size:13px;border:0;border-left:1px solid var(--color-divider);background:transparent;color:{{ newColor }};box-shadow:{{ newRing }};cursor:pointer">{{ ic.clock }}Neu</button>
+          </div>
+          <span style="flex:1"></span>
+          <button onClick="{{ openCatSheet }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;flex:none;max-width:140px;padding:0 10px;border:1px solid {{ filterBorder }};border-radius:var(--radius-md);background:transparent;color:{{ filterColor }};font-size:13px;cursor:pointer;white-space:nowrap;overflow:hidden" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ ic.funnel }}<span style="flex:none;white-space:nowrap">{{ filterLabel }}</span></button>
+        </div>
+
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:0 12px 84px;display:flex;flex-direction:column;gap:10px">
+        <sc-if value="{{ feedEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:48px 16px;color:color-mix(in srgb,var(--color-text) 55%,transparent);font-size:14px">Noch keine Witze hier. Reich den ersten ein!</div>
+        </sc-if>
+        <sc-for list="{{ feedJokes }}" as="j" hint-placeholder-count="3">
+          <article style="flex:none;background:var(--color-surface);border-radius:var(--radius-md);padding:0 0 8px;display:flex;flex-direction:column;gap:8px;overflow:hidden;box-shadow:{{ j.ring }}">
+            <sc-if value="{{ j.metaTop }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:color-mix(in srgb,var(--color-surface) 45%,var(--color-bg));border-bottom:1px solid color-mix(in srgb,var(--color-text) 6%,transparent);font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent);min-width:0">
+                <a onClick="{{ j.openAuthor }}" style="display:inline-flex;align-items:center;gap:6px;color:var(--color-accent-300);text-decoration:none;font-weight:500;cursor:pointer;white-space:nowrap"><span style="width:20px;height:20px;border-radius:50%;background:var(--color-accent-800);color:var(--color-accent-100);display:grid;place-items:center;font-size:10px">{{ j.initial }}</span>{{ j.author }}</a>
+                <span>· {{ j.time }}</span>
+                <span style="flex:1"></span>
+                <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent);white-space:nowrap">{{ j.catName }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ j.metaBottom }}" hint-placeholder-val="{{ false }}"><div style="height:6px"></div></sc-if>
+            <div onClick="{{ j.open }}" style="cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:0 14px">
+              <sc-if value="{{ j.hasTitle }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:var(--font-heading);font-weight:500;font-size:16px;line-height:1.3;margin-bottom:8px">{{ j.title }}</div>
+              </sc-if>
+              <p style="margin:0;font-size:17px;line-height:1.6;white-space:pre-wrap;text-wrap:pretty">{{ j.text }}</p>
+            </div>
+            <sc-if value="{{ j.hasStickers }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 14px 0;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--color-text) 6%,transparent)">
+                <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 45%,transparent);margin-right:2px">Sticker</span>
+                <sc-for list="{{ j.stickerList }}" as="s" hint-placeholder-count="0">
+                  <span title="{{ s.name }}" style="position:relative;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:{{ s.tint }};color:{{ s.ink }};box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--color-text) 8%,transparent)">{{ s.glyphSm }}<sc-if value="{{ s.multi }}" hint-placeholder-val="{{ false }}"><b style="position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:5px;background:var(--color-accent);color:var(--color-bg);font-size:10px;font-weight:500;display:grid;place-items:center">{{ s.count }}</b></sc-if></span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;padding:0 8px 0 14px">
+              <sc-if value="{{ j.metaBottom }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;display:flex;align-items:center;gap:6px;font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent);min-width:0;overflow:hidden">
+                  <a onClick="{{ j.openAuthor }}" style="color:var(--color-accent-300);text-decoration:none;font-weight:500;cursor:pointer;white-space:nowrap">{{ j.author }}</a>
+                  <span style="white-space:nowrap">· {{ j.time }}</span>
+                  <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ j.catName }}</span>
+                  <sc-if value="{{ j.boosted }}" hint-placeholder-val="{{ false }}"><span style="color:var(--color-accent);display:inline-flex">{{ ic.boltXs }}</span></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ j.metaTop }}" hint-placeholder-val="{{ false }}"><span style="flex:1"></span></sc-if>
+              <button onClick="{{ j.toggleFav }}" aria-label="Favorit" style="width:36px;height:36px;border:0;background:transparent;color:{{ j.favColor }};display:grid;place-items:center;cursor:pointer;border-radius:8px;flex:none" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ j.favIcon }}</button>
+              <div style="display:inline-flex;align-items:center;height:36px;border:1px solid var(--color-divider);border-radius:var(--radius-md);flex:none">
+                <button onClick="{{ j.up }}" aria-label="Upvote" style="width:40px;height:36px;border:0;background:transparent;color:{{ j.upColor }};display:grid;place-items:center;cursor:pointer;border-radius:7px 0 0 7px" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ ic.up }}</button>
+                <span style="min-width:30px;text-align:center;font-size:13px;font-weight:500;color:{{ j.scoreColor }}">{{ j.score }}</span>
+                <button onClick="{{ j.down }}" aria-label="Downvote" style="width:40px;height:36px;border:0;background:transparent;color:{{ j.downColor }};display:grid;place-items:center;cursor:pointer;border-radius:0 7px 7px 0" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ ic.down }}</button>
+              </div>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ DETAIL ══ -->
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Witz-Detail" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;flex:none">
+        <button onClick="{{ back }}" aria-label="Zurück" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.back }}</button>
+        <div style="flex:1;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent)">{{ detail.catName }}</div>
+        <button onClick="{{ toast }}" aria-label="Melden" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.flag }}</button>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:8px 20px 100px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-if value="{{ detail.hasTitle }}" hint-placeholder-val="{{ false }}"><div style="font-family:var(--font-heading);font-weight:500;font-size:20px;line-height:1.25;margin-bottom:8px">{{ detail.title }}</div></sc-if>
+          <p style="margin:0;font-size:19px;line-height:1.65;white-space:pre-wrap;text-wrap:pretty">{{ detail.text }}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">
+          <a onClick="{{ detail.openAuthor }}" style="display:inline-flex;align-items:center;gap:8px;color:var(--color-accent-300);text-decoration:none;font-weight:500;cursor:pointer"><span style="width:24px;height:24px;border-radius:50%;background:var(--color-accent-800);color:var(--color-accent-100);display:grid;place-items:center;font-size:11px">{{ detail.initial }}</span>{{ detail.author }}</a>
+          <span>· {{ detail.time }}</span>
+          <sc-if value="{{ detail.boosted }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;border:1px solid var(--color-accent);color:var(--color-accent);font-size:11px">{{ ic.boltXs }}Geboostet</span></sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:inline-flex;align-items:center;height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md)">
+            <button onClick="{{ detail.up }}" style="width:44px;height:40px;border:0;background:transparent;color:{{ detail.upColor }};display:grid;place-items:center;cursor:pointer;border-radius:7px 0 0 7px">{{ ic.up }}</button>
+            <span style="min-width:34px;text-align:center;font-size:14px;font-weight:500;color:{{ detail.scoreColor }}">{{ detail.score }}</span>
+            <button onClick="{{ detail.down }}" style="width:44px;height:40px;border:0;background:transparent;color:{{ detail.downColor }};display:grid;place-items:center;cursor:pointer;border-radius:0 7px 7px 0">{{ ic.down }}</button>
+          </div>
+          <button onClick="{{ detail.toggleFav }}" aria-label="Favorit" style="width:40px;height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:{{ detail.favColor }};display:grid;place-items:center;cursor:pointer;flex:none" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ detail.favIconLg }}</button>
+          <button onClick="{{ openAward }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:14px;font-weight:500;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-accent) 12%,transparent)">{{ ic.star }}Sticker verleihen</button>
+        </div>
+        <div style="height:1px;background:linear-gradient(to right,transparent,var(--color-divider) 48px,var(--color-divider) calc(100% - 48px),transparent)"></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 60%,transparent)">Verliehene Sticker · {{ awardCount }}</div>
+          <sc-if value="{{ noAwards }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Noch keine Sticker verliehen.</div></sc-if>
+          <sc-for list="{{ awards }}" as="a" hint-placeholder-count="2">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="width:36px;height:36px;flex:none;border-radius:8px;background:{{ a.tint }};color:{{ a.ink }};display:grid;place-items:center">{{ a.glyph }}</span>
+              <div style="flex:1;min-width:0;font-size:14px">
+                <div style="display:flex;gap:6px;align-items:baseline;flex-wrap:wrap"><span style="font-weight:500">{{ a.name }}</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">von <a onClick="{{ a.openGiver }}" style="color:var(--color-accent-300);text-decoration:none;cursor:pointer">{{ a.giver }}</a> · {{ a.time }}</span></div>
+                <sc-if value="{{ a.hasMsg }}" hint-placeholder-val="{{ false }}"><div style="margin-top:2px;font-size:14px;line-height:1.5;color:color-mix(in srgb,var(--color-text) 85%,transparent)">{{ a.msg }}</div></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ ME ══ -->
+    <sc-if value="{{ isMe }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Profil" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:2px;height:52px;padding:0 8px 0 16px;flex:none">
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px">Ich</div>
+        <button onClick="{{ toast }}" aria-label="Profil bearbeiten" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.pencil }}</button>
+        <button onClick="{{ logout }}" aria-label="Abmelden" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.signOut }}</button>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:4px 0 100px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:0 16px">
+          <div style="width:48px;height:48px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:500;background:var(--color-accent-800);color:var(--color-accent-100)">W</div>
+          <div style="min-width:0"><div style="font-family:var(--font-heading);font-weight:500;font-size:18px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">witzbold_88</div><div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);line-height:1.4">Lacht über eigene Witze. Immer.</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 16px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+          <button onClick="{{ goWallet }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:10px 12px 10px 0;border:0;background:transparent;color:var(--color-text);text-align:left;cursor:pointer;min-width:0"><span style="font-size:20px;font-weight:500;line-height:1.2;display:inline-flex;align-items:center;gap:5px;color:var(--color-accent-300)">{{ ic.coinSm }}{{ balance }}</span><span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Gnöcken</span></button>
+          <div style="display:flex;flex-direction:column;padding:10px 12px;border-left:1px solid var(--color-divider);min-width:0"><span style="font-size:20px;font-weight:500;line-height:1.2">1.340</span><span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Karma</span></div>
+          <div style="display:flex;flex-direction:column;padding:10px 12px;border-left:1px solid var(--color-divider);min-width:0"><span style="font-size:20px;font-weight:500;line-height:1.2">{{ stickerTotal }}</span><span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Sticker</span></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 16px">
+          <button onClick="{{ toast }}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:12px;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.gavel }}Moderation<span style="min-width:18px;height:18px;padding:0 5px;border-radius:5px;background:var(--color-accent-800);color:var(--color-accent-100);font-size:11px;display:grid;place-items:center">4</span></button>
+          <button onClick="{{ toast }}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:12px;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.tag }}Kategorien</button>
+          <button onClick="{{ toast }}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:12px;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.stack }}Sticker verwalten</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;margin:0 16px;font-size:14px">
+          <button onClick="{{ meTabJokes }}" style="height:40px;border:0;border-bottom:1px solid {{ meTab1Border }};background:transparent;color:{{ meTab1Color }};font-weight:500;cursor:pointer">Meine Witze</button>
+          <button onClick="{{ meTabFavs }}" style="height:40px;border:0;border-bottom:1px solid {{ meTab3Border }};background:transparent;color:{{ meTab3Color }};font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px">Favoriten<sc-if value="{{ hasFavs }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:5px;background:var(--color-accent-800);color:var(--color-accent-100);font-size:11px;display:grid;place-items:center">{{ favCount }}</span></sc-if></button>
+          <button onClick="{{ meTabColl }}" style="height:40px;border:0;border-bottom:1px solid {{ meTab2Border }};background:transparent;color:{{ meTab2Color }};font-weight:500;cursor:pointer">Sammlung</button>
+        </div>
+        <sc-if value="{{ meShowFavs }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 12px;display:flex;flex-direction:column;gap:10px">
+            <sc-if value="{{ noFavs }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:40px 16px;color:color-mix(in srgb,var(--color-text) 55%,transparent);font-size:14px;line-height:1.5">Noch keine Favoriten.<br>Tipp im Feed auf das Lesezeichen, um einen Witz zu merken.</div></sc-if>
+            <sc-for list="{{ favJokes }}" as="j" hint-placeholder-count="0">
+              <article style="flex:none;background:var(--color-surface);border-radius:var(--radius-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div onClick="{{ j.open }}" style="cursor:pointer;display:flex;flex-direction:column;gap:4px">
+                  <sc-if value="{{ j.hasTitle }}" hint-placeholder-val="{{ false }}"><div style="font-family:var(--font-heading);font-weight:500;font-size:16px;line-height:1.3;margin-bottom:8px">{{ j.title }}</div></sc-if>
+                  <p style="margin:0;font-size:17px;line-height:1.6;white-space:pre-wrap;text-wrap:pretty">{{ j.text }}</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent);min-width:0">
+                  <a onClick="{{ j.openAuthor }}" style="color:var(--color-accent-300);text-decoration:none;font-weight:500;cursor:pointer">{{ j.author }}</a>
+                  <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent)">{{ j.catName }}</span>
+                  <span style="flex:1"></span>
+                  <span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:500;color:var(--color-accent-300)">{{ ic.up }}{{ j.score }}</span>
+                  <button onClick="{{ j.toggleFav }}" aria-label="Favorit entfernen" style="width:32px;height:32px;border:0;background:transparent;color:var(--color-accent);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ ic.bookmarkFill }}</button>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ meShowJokes }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:0 12px;display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ myJokes }}" as="j" hint-placeholder-count="2">
+              <article style="flex:none;background:var(--color-surface);border-radius:var(--radius-md);padding:0 14px 8px;display:flex;flex-direction:column;gap:8px;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:6px;margin:0 -14px;padding:8px 14px;background:color-mix(in srgb,var(--color-surface) 45%,var(--color-bg));border-bottom:1px solid color-mix(in srgb,var(--color-text) 6%,transparent);font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;background:{{ j.statusBg }};color:{{ j.statusColor }};font-size:11px;letter-spacing:.02em">{{ j.statusLabel }}</span>
+                  <span>{{ j.time }}</span><span style="flex:1"></span>
+                  <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent)">{{ j.catName }}</span>
+                </div>
+                <div onClick="{{ j.open }}" style="cursor:pointer;display:flex;flex-direction:column;gap:4px">
+                  <sc-if value="{{ j.hasTitle }}" hint-placeholder-val="{{ false }}"><div style="font-family:var(--font-heading);font-weight:500;font-size:16px;line-height:1.3;margin-bottom:8px">{{ j.title }}</div></sc-if>
+                  <p style="margin:0;font-size:17px;line-height:1.6;white-space:pre-wrap;text-wrap:pretty">{{ j.text }}</p>
+                </div>
+                <sc-if value="{{ j.hasReason }}" hint-placeholder-val="{{ false }}"><div style="padding:8px 10px;border-radius:6px;background:var(--color-neutral-900);color:var(--color-neutral-100);font-size:13px;line-height:1.45">{{ j.reason }}</div></sc-if>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;color:{{ j.scoreColor }};padding-left:2px">{{ ic.up }}{{ j.score }}</span>
+                  <span style="flex:1"></span>
+                  <sc-if value="{{ j.canBoost }}" hint-placeholder-val="{{ false }}"><button onClick="{{ j.boost }}" style="display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:var(--color-accent);font-size:12px;font-weight:500;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ ic.boltXs }}Boost · 50 Gnöcken, 24 h</button></sc-if>
+                  <sc-if value="{{ j.canWithdraw }}" hint-placeholder-val="{{ false }}"><button onClick="{{ j.withdraw }}" style="display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:var(--color-accent);font-size:12px;font-weight:500;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-accent) 10%,transparent)">{{ ic.x }}Zurückziehen</button></sc-if>
+                  <sc-if value="{{ j.boosted }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--color-accent);padding:0 6px">{{ ic.boltXs }}Geboostet · noch 19 h</span></sc-if>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ meShowColl }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+            <sc-for list="{{ myStickers }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">
+                <div style="position:relative;width:100%;aspect-ratio:1;border-radius:10px;background:radial-gradient(circle at 50% 35%,{{ s.tint }},var(--color-surface) 78%);color:{{ s.ink }};display:grid;place-items:center;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--color-text) 8%,transparent)">{{ s.glyphLg }}<span style="position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:var(--color-accent-800);color:var(--color-accent-100);font-size:11px;font-weight:500;display:grid;place-items:center">{{ s.qty }}</span></div>
+                <div style="font-size:11px;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:color-mix(in srgb,var(--color-text) 80%,transparent)">{{ s.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ PUBLIC PROFILE ══ -->
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Öffentliches Profil" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;flex:none">
+        <button onClick="{{ back }}" aria-label="Zurück" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.back }}</button>
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ profile.nick }}</div>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 100px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:48px;height:48px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:500;background:var(--color-accent-800);color:var(--color-accent-100)">{{ profile.initial }}</div>
+          <div style="min-width:0"><div style="font-family:var(--font-heading);font-weight:500;font-size:18px;line-height:1.2">{{ profile.nick }}</div><div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);line-height:1.4">{{ profile.bio }}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+          <div style="display:flex;flex-direction:column;padding:10px 12px 10px 0;min-width:0"><span style="font-size:20px;font-weight:500;line-height:1.2">{{ profile.karma }}</span><span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Karma</span></div>
+          <div style="display:flex;flex-direction:column;padding:10px 12px;border-left:1px solid var(--color-divider);min-width:0"><span style="font-size:20px;font-weight:500;line-height:1.2">{{ profile.jokes }}</span><span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Freigegebene Witze</span></div>
+        </div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 60%,transparent)">Sammlung · {{ profile.stickerTotal }}</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+          <sc-for list="{{ profile.stickers }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">
+              <div style="position:relative;width:100%;aspect-ratio:1;border-radius:10px;background:radial-gradient(circle at 50% 35%,{{ s.tint }},var(--color-surface) 78%);color:{{ s.ink }};display:grid;place-items:center;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--color-text) 8%,transparent)">{{ s.glyphLg }}<span style="position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:var(--color-accent-800);color:var(--color-accent-100);font-size:11px;font-weight:500;display:grid;place-items:center">{{ s.qty }}</span></div>
+              <div style="font-size:11px;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:color-mix(in srgb,var(--color-text) 80%,transparent)">{{ s.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 60%,transparent);margin-top:4px">Beste Witze</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin:0 -4px">
+          <sc-for list="{{ profile.topJokes }}" as="j" hint-placeholder-count="2">
+            <article onClick="{{ j.open }}" style="background:var(--color-surface);border-radius:var(--radius-md);padding:12px 14px;display:flex;gap:12px;align-items:flex-start;cursor:pointer">
+              <p style="margin:0;flex:1;font-size:15px;line-height:1.55;text-wrap:pretty">{{ j.text }}</p>
+              <span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:500;color:var(--color-accent-300);flex:none">{{ ic.up }}{{ j.score }}</span>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ RANKINGS ══ -->
+    <sc-if value="{{ isRankings }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Rangliste" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:8px;height:52px;padding:0 16px;flex:none">
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px">Rangliste</div>
+        <div style="display:inline-flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;height:32px">
+          <button onClick="{{ periodDay }}" style="padding:0 10px;font-size:12px;border:0;background:transparent;color:{{ dayColor }};box-shadow:{{ dayRing }};cursor:pointer">Heute</button>
+          <button onClick="{{ periodWeek }}" style="padding:0 10px;font-size:12px;border:0;border-left:1px solid var(--color-divider);background:transparent;color:{{ weekColor }};box-shadow:{{ weekRing }};cursor:pointer">Woche</button>
+          <button onClick="{{ periodAll }}" style="padding:0 10px;font-size:12px;border:0;border-left:1px solid var(--color-divider);background:transparent;color:{{ allColor }};box-shadow:{{ allRing }};cursor:pointer">Immer</button>
+        </div>
+      </header>
+      <div style="display:grid;grid-template-columns:1fr 1fr;margin:4px 16px 0;font-size:14px;flex:none">
+        <button onClick="{{ rankTabJokes }}" style="height:40px;border:0;border-bottom:1px solid {{ rTab1Border }};background:transparent;color:{{ rTab1Color }};font-weight:500;cursor:pointer">Witze</button>
+        <button onClick="{{ rankTabAuthors }}" style="height:40px;border:0;border-bottom:1px solid {{ rTab2Border }};background:transparent;color:{{ rTab2Color }};font-weight:500;cursor:pointer">Autoren</button>
+      </div>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:12px 12px 100px;display:flex;flex-direction:column;gap:10px">
+        <sc-if value="{{ rankShowJokes }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ rankJokes }}" as="j" hint-placeholder-count="3">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span style="width:26px;flex:none;padding-top:12px;text-align:right;font-family:var(--font-heading);font-weight:500;font-size:20px;line-height:1;color:{{ j.rankColor }}">{{ j.rank }}</span>
+              <article style="flex:1;min-width:0;background:var(--color-surface);border-radius:var(--radius-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <p onClick="{{ j.open }}" style="margin:0;font-size:16px;line-height:1.55;cursor:pointer;text-wrap:pretty">{{ j.text }}</p>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent);min-width:0">
+                  <a onClick="{{ j.openAuthor }}" style="color:var(--color-accent-300);text-decoration:none;font-weight:500;cursor:pointer">{{ j.author }}</a>
+                  <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ j.catName }}</span>
+                  <span style="flex:1"></span>
+                  <span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:500;color:var(--color-accent-300)">{{ ic.up }}{{ j.score }}</span>
+                </div>
+              </article>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ rankShowAuthors }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ rankAuthors }}" as="a" hint-placeholder-count="4">
+            <button onClick="{{ a.open }}" style="display:flex;align-items:center;gap:12px;padding:10px 4px;border:0;background:transparent;color:var(--color-text);text-align:left;cursor:pointer;border-bottom:1px solid var(--color-divider)">
+              <span style="width:26px;flex:none;text-align:right;font-family:var(--font-heading);font-weight:500;font-size:20px;line-height:1;color:{{ a.rankColor }}">{{ a.rank }}</span>
+              <span style="width:36px;height:36px;flex:none;border-radius:50%;background:var(--color-accent-800);color:var(--color-accent-100);display:grid;place-items:center;font-size:14px;font-weight:500">{{ a.initial }}</span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:500">{{ a.nick }}</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">{{ a.jokes }} Witze</span></span>
+              <span style="font-size:15px;font-weight:500;color:var(--color-accent-300)">{{ a.karma }}<span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin-left:5px">Karma</span></span>
+            </button>
+          </sc-for>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ MARKET ══ -->
+    <sc-if value="{{ isMarket }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Marktplatz" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:8px;height:52px;padding:0 8px 0 16px;flex:none">
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px">Sticker</div>
+        <button onClick="{{ goWallet }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:13px;font-weight:500;cursor:pointer" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.coin }}{{ balance }}</button>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 100px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-content:start">
+        <sc-for list="{{ market }}" as="s" hint-placeholder-count="4">
+          <div style="background:var(--color-surface);border-radius:var(--radius-md);padding:12px;display:flex;flex-direction:column;gap:8px;opacity:{{ s.opacity }}">
+            <div style="width:100%;aspect-ratio:1;border-radius:10px;background:radial-gradient(circle at 50% 38%,{{ s.tint }},var(--color-neutral-900) 80%);color:{{ s.ink }};display:grid;place-items:center;position:relative;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--color-text) 8%,transparent)">{{ s.glyphXl }}
+              <sc-if value="{{ s.hasOwned }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:8px;left:8px;padding:2px 7px;border-radius:6px;background:var(--color-accent-800);color:var(--color-accent-100);font-size:11px">{{ s.ownedLabel }}</span></sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</div>
+              <div style="font-size:12px;line-height:1.4;color:color-mix(in srgb,var(--color-text) 55%,transparent);min-height:34px">{{ s.desc }}</div>
+              <sc-if value="{{ s.hasStock }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:var(--color-accent)">{{ s.stockLabel }}</div></sc-if>
+            </div>
+            <button onClick="{{ s.buy }}" disabled="{{ s.soldOut }}" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:14px;font-weight:500;cursor:pointer;margin-top:auto" style-hover="background:color-mix(in srgb,var(--color-accent) 12%,transparent)">{{ s.buyIcon }}{{ s.buyLabel }}</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ WALLET ══ -->
+    <sc-if value="{{ isWallet }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Wallet" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;flex:none">
+        <button onClick="{{ back }}" aria-label="Zurück" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.back }}</button>
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px">Gnöcken</div>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:12px 16px 100px;display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;flex-direction:column;gap:14px;padding:8px 0 0">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 60%,transparent)">Dein Guthaben</div>
+          <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-heading);font-weight:500;font-size:44px;line-height:1;letter-spacing:-.02em;color:var(--color-accent-300)">{{ ic.coinLg }}{{ balance }}</div>
+          <button onClick="{{ watchAd }}" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:14px;font-weight:500;cursor:pointer;align-self:flex-start;padding:0 16px" style-hover="background:color-mix(in srgb,var(--color-accent) 12%,transparent)">{{ ic.play }}Werbung ansehen · +10</button>
+        </div>
+        <div style="height:1px;background:linear-gradient(to right,transparent,var(--color-divider) 48px,var(--color-divider) calc(100% - 48px),transparent)"></div>
+        <div style="display:flex;flex-direction:column">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 60%,transparent);margin-bottom:8px">Verlauf</div>
+          <sc-for list="{{ transactions }}" as="tx" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid color-mix(in srgb,var(--color-text) 8%,transparent)">
+              <span style="width:32px;height:32px;flex:none;border-radius:8px;background:var(--color-surface);color:var(--color-accent-300);display:grid;place-items:center">{{ tx.icon }}</span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px">{{ tx.label }}</span><span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ tx.desc }} · {{ tx.time }}</span></span>
+              <span style="font-size:14px;font-weight:500;color:{{ tx.color }};white-space:nowrap">{{ tx.amount }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ SUBMIT ══ -->
+    <sc-if value="{{ isSubmit }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Einreichen" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;flex:none">
+        <button onClick="{{ back }}" aria-label="Zurück" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.back }}</button>
+        <div style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:18px">Witz einreichen</div>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:8px 16px 100px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Kategorie</label>
+          <button onClick="{{ openCatPicker }}" style="display:flex;align-items:center;gap:8px;min-height:40px;padding:0 10px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface);color:{{ pickColor }};font-size:14px;text-align:left;cursor:pointer" style-hover="border-color:color-mix(in srgb,var(--color-text) 45%,transparent)"><span style="flex:1">{{ pickLabel }}</span>{{ ic.caret }}</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Titel (optional)</label>
+          <input value="{{ subTitle }}" onChange="{{ setSubTitle }}" maxLength="{{ 120 }}" style="width:100%;min-height:40px;padding:6px 10px;font-size:14px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Dein Witz</label>
+          <textarea value="{{ subText }}" onChange="{{ setSubText }}" maxLength="{{ 2000 }}" rows="{{ 8 }}" placeholder="Pointe nicht vergessen …" style="width:100%;padding:10px;font-size:17px;line-height:1.6;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical;outline:none" style-focus="border-color:var(--color-accent)"></textarea>
+          <div style="font-size:11px;text-align:right;color:color-mix(in srgb,var(--color-text) 50%,transparent)">{{ subLen }}/2000</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;color:color-mix(in srgb,var(--color-text) 65%,transparent)"><span style="color:var(--color-accent-300);flex:none;margin-top:2px">{{ ic.coinSm }}</span><span>Einreichen kostet 20 Gnöcken ({{ balance }} vorhanden). Nach der Freigabe erscheint dein Witz im Feed.</span></div>
+        <button onClick="{{ submitJoke }}" disabled="{{ subDisabled }}" style="display:inline-flex;align-items:center;justify-content:center;height:44px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:14px;font-weight:500;cursor:pointer;opacity:{{ subOpacity }}" style-hover="background:color-mix(in srgb,var(--color-accent) 12%,transparent)">Einreichen</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ LOGIN ══ -->
+    <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Anmelden" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;flex:none">
+        <button onClick="{{ goFeed }}" aria-label="Zurück" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.back }}</button>
+      </header>
+      <div style="flex:1;padding:24px 24px 40px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+          <div style="width:32px;height:2px;background:var(--color-accent);border-radius:1px"></div>
+          <div style="font-family:var(--font-heading);font-weight:500;font-size:28px;letter-spacing:-.015em;line-height:1.1">Anmelden</div>
+          <div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Zum Abstimmen, Einreichen und Sammeln.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">E-Mail</label><input type="email" placeholder="du@beispiel.at" style="width:100%;min-height:44px;padding:6px 12px;font-size:15px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)"></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Passwort</label><input type="password" placeholder="••••••••" style="width:100%;min-height:44px;padding:6px 12px;font-size:15px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)"></div>
+        <button onClick="{{ login }}" style="display:inline-flex;align-items:center;justify-content:center;height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:15px;font-weight:500;cursor:pointer;margin-top:6px" style-hover="background:color-mix(in srgb,var(--color-accent) 12%,transparent)">Anmelden</button>
+        <div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent);text-align:center">Noch kein Konto? <a onClick="{{ goRegister }}" style="color:var(--color-accent-300);cursor:pointer;text-decoration:none;font-weight:500">Konto erstellen</a></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ REGISTER ══ -->
+    <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Konto erstellen" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <header style="display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;flex:none">
+        <button onClick="{{ goLogin }}" aria-label="Zurück" style="width:40px;height:40px;border:0;background:transparent;color:var(--color-text);display:grid;place-items:center;cursor:pointer;border-radius:8px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">{{ ic.back }}</button>
+      </header>
+      <div class="gn-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:24px 24px 40px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+          <div style="width:32px;height:2px;background:var(--color-accent);border-radius:1px"></div>
+          <div style="font-family:var(--font-heading);font-weight:500;font-size:28px;letter-spacing:-.015em;line-height:1.1">Konto erstellen</div>
+          <div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Du startest mit 100 Gnöcken.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Nickname</label><input placeholder="witzbold_88" style="width:100%;min-height:44px;padding:6px 12px;font-size:15px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)"><div style="font-size:11px;color:color-mix(in srgb,var(--color-text) 50%,transparent)">3–20 Zeichen, Buchstaben, Ziffern und _</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">E-Mail</label><input type="email" placeholder="du@beispiel.at" style="width:100%;min-height:44px;padding:6px 12px;font-size:15px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)"></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:12px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Passwort</label><input type="password" placeholder="mindestens 8 Zeichen" style="width:100%;min-height:44px;padding:6px 12px;font-size:15px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)"></div>
+        <button onClick="{{ login }}" style="display:inline-flex;align-items:center;justify-content:center;height:46px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:15px;font-weight:500;cursor:pointer;margin-top:6px" style-hover="background:color-mix(in srgb,var(--color-accent) 12%,transparent)">Konto erstellen</button>
+        <div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent);text-align:center">Schon ein Konto? <a onClick="{{ goLogin }}" style="color:var(--color-accent-300);cursor:pointer;text-decoration:none;font-weight:500">Anmelden</a></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ══ BOTTOM NAV ══ -->
+    <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+      <nav style="position:absolute;left:0;right:0;bottom:0;height:64px;display:grid;grid-template-columns:1fr 1fr 72px 1fr 1fr;background:var(--color-bg);z-index:4">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--color-divider) 48px,var(--color-divider) calc(100% - 48px),transparent)"></div>
+        <button onClick="{{ goFeed }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:{{ navFeedColor }};font-size:11px;font-weight:500;cursor:pointer">{{ ic.smiley }}Witze</button>
+        <button onClick="{{ goRankings }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:{{ navRankColor }};font-size:11px;font-weight:500;cursor:pointer">{{ ic.trophy }}Rangliste</button>
+        <button onClick="{{ goSubmit }}" aria-label="Witz einreichen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:{{ navSubmitColor }};font-size:11px;font-weight:500;cursor:pointer"><span style="width:46px;height:46px;margin-top:-24px;border-radius:50%;background:var(--color-accent);color:var(--color-bg);display:grid;place-items:center;box-shadow:0 0 0 6px var(--color-bg),0 6px 16px rgba(0,0,0,.5)">{{ ic.plus }}</span>Neu</button>
+        <button onClick="{{ goMarket }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:{{ navMarketColor }};font-size:11px;font-weight:500;cursor:pointer">{{ ic.store }}Sticker</button>
+        <button onClick="{{ goMe }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:{{ navMeColor }};font-size:11px;font-weight:500;cursor:pointer">{{ ic.user }}Ich</button>
+      </nav>
+    </sc-if>
+
+    <!-- ══ CATEGORY SHEET ══ -->
+    <sc-if value="{{ catSheetOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSheets }}" style="position:absolute;inset:0;z-index:10;background:color-mix(in srgb,var(--color-neutral-900) 60%,transparent);animation:gnFade .15s ease-out"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:var(--color-surface);border-radius:var(--radius-lg) var(--radius-lg) 0 0;box-shadow:var(--shadow-md);padding:8px 16px 24px;display:flex;flex-direction:column;gap:12px;animation:gnSheetIn .2s ease-out">
+        <div style="width:32px;height:4px;border-radius:2px;margin:0 auto 4px;background:var(--color-divider)"></div>
+        <div style="font-family:var(--font-heading);font-weight:500;font-size:17px">{{ sheetTitle }}</div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+          <sc-for list="{{ sheetCats }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.pick }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:1px solid {{ c.border }};border-radius:var(--radius-md);background:transparent;color:{{ c.color }};font-size:14px;text-align:left;cursor:pointer;min-width:0" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)"><span style="width:16px;height:16px;flex:none;border-radius:{{ c.dotRadius }};border:1.5px solid {{ c.dotBorder }};background:{{ c.dotBg }};box-shadow:{{ c.dotShadow }};display:grid;place-items:center;color:var(--color-bg)"><sc-if value="{{ c.checked }}" hint-placeholder-val="{{ false }}">{{ ic.checkXs }}</sc-if></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.name }}</span></button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ sheetShowsPeriod }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 60%,transparent);margin-top:4px">Zeitraum für Top</div>
+          <div style="display:inline-flex;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;height:36px;align-self:flex-start">
+            <button onClick="{{ periodDay }}" style="padding:0 14px;font-size:13px;border:0;background:transparent;color:{{ dayColor }};box-shadow:{{ dayRing }};cursor:pointer">Heute</button>
+            <button onClick="{{ periodWeek }}" style="padding:0 14px;font-size:13px;border:0;border-left:1px solid var(--color-divider);background:transparent;color:{{ weekColor }};box-shadow:{{ weekRing }};cursor:pointer">Woche</button>
+            <button onClick="{{ periodAll }}" style="padding:0 14px;font-size:13px;border:0;border-left:1px solid var(--color-divider);background:transparent;color:{{ allColor }};box-shadow:{{ allRing }};cursor:pointer">Immer</button>
+          </div>
+        </sc-if>
+        <button onClick="{{ closeSheets }}" style="height:40px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;font-weight:500;cursor:pointer;margin-top:4px" style-hover="background:color-mix(in srgb,var(--color-text) 7%,transparent)">Fertig</button>
+      </div>
+    </sc-if>
+
+    <!-- ══ AWARD SHEET ══ -->
+    <sc-if value="{{ awardOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSheets }}" style="position:absolute;inset:0;z-index:10;background:color-mix(in srgb,var(--color-neutral-900) 60%,transparent);animation:gnFade .15s ease-out"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:var(--color-surface);border-radius:var(--radius-lg) var(--radius-lg) 0 0;box-shadow:var(--shadow-md);padding:8px 16px 24px;display:flex;flex-direction:column;gap:12px;animation:gnSheetIn .2s ease-out">
+        <div style="width:32px;height:4px;border-radius:2px;margin:0 auto 4px;background:var(--color-divider)"></div>
+        <div style="font-family:var(--font-heading);font-weight:500;font-size:17px">Sticker verleihen</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+          <sc-for list="{{ awardStickers }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.pick }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:var(--color-text);cursor:pointer;min-width:0">
+              <span style="position:relative;width:100%;aspect-ratio:1;border-radius:10px;background:radial-gradient(circle at 50% 35%,{{ s.tint }},var(--color-bg) 78%);color:{{ s.ink }};display:grid;place-items:center;box-shadow:{{ s.ring }}">{{ s.glyphLg }}<span style="position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:var(--color-accent-800);color:var(--color-accent-100);font-size:11px;font-weight:500;display:grid;place-items:center">{{ s.qty }}</span></span>
+              <span style="font-size:11px;width:100%;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <input placeholder="Nachricht (optional)" maxLength="{{ 140 }}" style="width:100%;min-height:40px;padding:6px 10px;font-size:14px;color:var(--color-text);caret-color:var(--color-accent);background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-md);outline:none" style-focus="border-color:var(--color-accent)">
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button onClick="{{ closeSheets }}" style="height:40px;padding:0 12px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;color:var(--color-text);font-size:14px;font-weight:500;cursor:pointer">Abbrechen</button>
+          <button onClick="{{ giveAward }}" disabled="{{ awardDisabled }}" style="height:40px;padding:0 14px;border:1px solid var(--color-accent);border-radius:var(--radius-md);background:transparent;color:var(--color-accent);font-size:14px;font-weight:500;cursor:pointer;opacity:{{ awardOpacity }}">Verleihen</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ══ TOAST ══ -->
+    <sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:16px;right:16px;bottom:76px;z-index:20;padding:10px 14px;border-radius:var(--radius-md);background:var(--color-neutral-900);color:var(--color-neutral-100);font-size:13px;box-shadow:var(--shadow-md);animation:gnSheetIn .18s ease-out;text-align:center">{{ toastText }}</div>
+    </sc-if>
+
+  </div>
+  </x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;metaPosition&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;top&quot;,&quot;options&quot;:[&quot;top&quot;,&quot;bottom&quot;],&quot;tsType&quot;:&quot;'top' | 'bottom'&quot;,&quot;section&quot;:&quot;Feed&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dark&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;,&quot;system&quot;],&quot;tsType&quot;:&quot;'dark' | 'light' | 'system'&quot;,&quot;section&quot;:&quot;Darstellung&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'feed', stack: [], param: null,
+    sort: 'HOT', period: 'WEEK', cats: [], favs: ['j4'],
+    meTab: 'jokes', rankTab: 'jokes',
+    catSheet: false, catPicker: false, awardOpen: false, sortMenu: false,
+    awardPick: null, toast: null,
+    balance: 120, owned: { s1: 3, s3: 2, s6: 1 },
+    subCat: null, subTitle: '', subText: '',
+    systemDark: true,
+    jokes: [
+      { id: 'j1', title: 'Bäckerei', text: 'Was macht ein Clown im Büro?\nFaxen.', cat: 'buero', authorId: 'u1', time: 'vor 2 h', score: 128, myVote: 1, boosted: true, stickers: [['s1', 3], ['s2', 1]], status: 'APPROVED' },
+      { id: 'j2', text: 'Mein Arzt sagt, ich soll mehr auf mein Herz hören. Jetzt sitze ich hier und höre nur „Pizza“.', cat: 'schwarz', authorId: 'u2', time: 'vor 5 h', score: 64, myVote: null, stickers: [], status: 'APPROVED' },
+      { id: 'j3', text: 'Chef: „Sie kommen schon wieder zu spät!“\n„Ja, aber ich gehe dafür auch früher.“', cat: 'buero', authorId: 'u3', time: 'gestern', score: 41, myVote: null, stickers: [['s3', 2]], status: 'APPROVED' },
+      { id: 'j4', title: 'Zwei Kühe', text: 'Stehen zwei Kühe auf der Weide. Sagt die eine: „Muh.“ Sagt die andere: „Das wollte ich auch gerade sagen.“', cat: 'tiere', authorId: 'u4', time: 'vor 8 h', score: 93, myVote: null, stickers: [['s1', 1]], status: 'APPROVED' },
+      { id: 'j5', text: 'Ich habe einen Witz über Zeitreisen. Aber den fandet ihr nächste Woche schon nicht lustig.', cat: 'wort', authorId: 'u2', time: 'vor 1 Tag', score: 77, myVote: null, stickers: [], status: 'APPROVED' },
+      { id: 'j6', text: 'Was ist grün und klopft an der Tür?\nEin Klopfsalat.', cat: 'flach', authorId: 'u1', time: 'vor 3 Tagen', score: 22, myVote: -1, stickers: [], status: 'APPROVED' },
+      { id: 'j7', text: 'Warum können Geister so schlecht lügen?\nWeil man durch sie hindurchsieht.', cat: 'kinder', authorId: 'u4', time: 'vor 2 Tagen', score: 35, myVote: null, stickers: [['s6', 1]], status: 'APPROVED' },
+      { id: 'j8', text: 'Treffen sich zwei Jäger. Beide tot.', cat: 'tiere', authorId: 'u1', time: 'vor 20 min', score: 0, myVote: null, stickers: [], status: 'PENDING' },
+      { id: 'j9', text: 'Ein Witz über meinen Nachbarn, den ich hier lieber nicht wiederhole.', cat: 'schwarz', authorId: 'u1', time: 'vor 4 Tagen', score: 0, myVote: null, stickers: [], status: 'REJECTED', reason: 'Bitte keine Witze über identifizierbare Personen.' },
+    ],
+    awards: { j1: [
+      { sticker: 's1', giverId: 'u2', time: 'vor 1 h', msg: 'Ich hab Kaffee verschüttet. Danke.' },
+      { sticker: 's1', giverId: 'u3', time: 'vor 1 h' },
+      { sticker: 's2', giverId: 'u4', time: 'vor 2 h', msg: 'Verdient.' },
+      { sticker: 's1', giverId: 'u4', time: 'vor 2 h' },
+    ] },
+  };
+  cats = [
+    { id: 'flach', name: 'Flachwitze' }, { id: 'schwarz', name: 'Schwarzer Humor' }, { id: 'buero', name: 'Büro' },
+    { id: 'tiere', name: 'Tiere' }, { id: 'wort', name: 'Wortspiele' }, { id: 'kinder', name: 'Kinderwitze' },
+  ];
+  stickerDefs = [
+    { id: 's1', name: 'Lachträne', price: 40, desc: 'Für Witze, die Tränen kosten.', glyph: 'tear', tint: 'var(--color-accent-800)', ink: 'var(--color-accent-200)' },
+    { id: 's2', name: 'Goldene Gans', price: 120, desc: 'Selten. Nur für Legenden.', stock: 3, glyph: 'feather', tint: 'var(--color-accent-700)', ink: 'var(--color-accent-100)' },
+    { id: 's3', name: 'Trockener Keks', price: 25, desc: 'So trocken, dass man husten muss.', glyph: 'cookie', tint: 'var(--color-neutral-800)', ink: 'var(--color-neutral-200)' },
+    { id: 's4', name: 'Kronjuwel', price: 250, desc: 'Der teuerste Sticker im Laden.', soldOut: true, glyph: 'crown', tint: 'var(--color-accent-600)', ink: 'var(--color-accent-100)' },
+    { id: 's5', name: 'Zwerchfell', price: 60, desc: 'Wenn es körperlich wehtut.', glyph: 'bolt', tint: 'var(--color-accent-900)', ink: 'var(--color-accent-300)' },
+    { id: 's6', name: 'Ehrenrunde', price: 30, desc: 'Fast lustig. Trotzdem Respekt.', glyph: 'medal', tint: 'var(--color-neutral-900)', ink: 'var(--color-neutral-300)' },
+  ];
+  glyphPaths = {
+    tear: ['M12 3c3.5 4.5 6 7.8 6 11a6 6 0 0 1-12 0c0-3.2 2.5-6.5 6-11z', 'M9.5 14.5c.6 1.3 1.5 2 2.5 2'],
+    feather: ['M20 4c-6 0-11 4-13 10l-3 6', 'M20 4c0 6-4 11-10 13H7', 'M7 17l6-6', 'M10 14h5', 'M12.5 11.5v-4'],
+    cookie: ['M12 3a9 9 0 1 0 9 9 3 3 0 0 1-3-3 3 3 0 0 1-3-3 3 3 0 0 1-3-3z', 'M8.5 9.5h.01', 'M8 15h.01', 'M13 16h.01', 'M15.5 12.5h.01'],
+    crown: ['M4 18h16', 'M4 18L3 8l5 3 4-6 4 6 5-3-1 10z'],
+    bolt: ['M13 2L5 14h6l-1 8 9-13h-6z'],
+    medal: ['M12 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10z', 'M8.5 7L6 2h5', 'M15.5 7L18 2h-5', 'M12 9.5l.9 1.8 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z'],
+  };
+  sticker(id) {
+    const d = this.stickerDefs.find(x => x.id === id);
+    const G = this.glyphPaths[d.glyph];
+    return { name: d.name, tint: d.tint, ink: d.ink, glyphSm: this.svg(G, 16), glyph: this.svg(G, 20), glyphLg: this.svg(G, 30), glyphXl: this.svg(G, 48) };
+  }
+  users = {
+    u1: { nick: 'witzbold_88', bio: 'Lacht über eigene Witze. Immer.', karma: 1340, jokes: 12 },
+    u2: { nick: 'frau_holle', bio: 'Schüttelt Witze wie Kissen.', karma: 2410, jokes: 37 },
+    u3: { nick: 'der_kalauer', bio: 'Flach ist das neue Tief.', karma: 880, jokes: 9 },
+    u4: { nick: 'pointe_paul', bio: 'Kommt immer zu spät. Mit Absicht.', karma: 1990, jokes: 21 },
+  };
+  publicStickers = { u2: { s1: 14, s2: 3, s3: 9, s4: 1, s5: 6, s6: 2 }, u3: { s3: 4, s1: 2 }, u4: { s1: 7, s6: 5, s5: 1 }, u1: { s1: 3, s3: 2, s6: 1 } };
+  txs = [
+    { type: 'AD_REWARD', amount: 10, desc: 'Rewarded Ad', time: 'vor 1 h' },
+    { type: 'BOOST', amount: -50, desc: 'Bäckerei', time: 'vor 2 h' },
+    { type: 'JOKE_APPROVED', amount: 15, desc: 'Bäckerei', time: 'vor 2 h' },
+    { type: 'SUBMIT_FEE', amount: -20, desc: 'Bäckerei', time: 'gestern' },
+    { type: 'STICKER_PURCHASE', amount: -40, desc: 'Lachträne', time: 'vor 3 Tagen' },
+    { type: 'WELCOME', amount: 100, desc: 'Willkommen bei Gnöckly', time: 'vor 2 Wochen' },
+  ];
+
+  componentDidMount() {
+    const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq) { this.setState({ systemDark: mq.matches }); this._mql = mq; this._onMq = (e) => this.setState({ systemDark: e.matches }); mq.addEventListener('change', this._onMq); }
+  }
+  componentWillUnmount() { if (this._mql) this._mql.removeEventListener('change', this._onMq); }
+
+  svg(d, size, opts) {
+    const o = opts || {};
+    return React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: o.fill ? 'currentColor' : 'none', stroke: o.fill ? 'none' : 'currentColor', strokeWidth: o.sw || 1.6, strokeLinecap: 'round', strokeLinejoin: 'round', style: { display: 'block', flex: 'none' } }, ...[].concat(d).map((p, i) => React.createElement('path', { key: i, d: p })));
+  }
+  icons() {
+    const P = {
+      fire: 'M12 22c4.4 0 7-2.8 7-6.5 0-3.2-2-5.3-3.5-7.5-.4 1.6-1.3 2.5-2.5 3-.3-3-1.7-6-4.5-8 .4 3-1 4.6-2.5 6.4C4.7 11 5 13 5 15.5 5 19.2 7.6 22 12 22z',
+      trend: ['M3 17l6-6 4 4 8-8', 'M15 7h6v6'],
+      clock: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 7v5l3.5 2'],
+      funnel: 'M4 5h16l-6.5 7.5V19l-3-1.5v-5z',
+      caret: 'M7 10l5 5 5-5',
+      up: ['M12 19V5', 'M6 11l6-6 6 6'],
+      down: ['M12 5v14', 'M6 13l6 6 6-6'],
+      coin: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z'],
+      star: 'M12 3.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.8l6.1-.7z',
+      user: ['M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z', 'M4 21c1.5-3.5 4.5-5.5 8-5.5s6.5 2 8 5.5'],
+      trophy: ['M8 4h8v6a4 4 0 0 1-8 0z', 'M8 6H4.5c0 3 1.5 4.5 3.5 4.5', 'M16 6h3.5c0 3-1.5 4.5-3.5 4.5', 'M12 14v4', 'M8 21h8', 'M9 18h6'],
+      store: ['M4 10l1.5-5h13L20 10', 'M4 10v10h16V10', 'M4 10a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 10', 'M10 20v-5h4v5'],
+      smiley: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M8 14c1 1.6 2.4 2.4 4 2.4s3-.8 4-2.4', 'M9 10h.01', 'M15 10h.01'],
+      plus: ['M12 5v14', 'M5 12h14'],
+      back: ['M19 12H5', 'M11 6l-6 6 6 6'],
+      pencil: ['M15 5l4 4L8 20H4v-4z', 'M13 7l4 4'],
+      signOut: ['M14 4h5v16h-5', 'M10 8l-4 4 4 4', 'M6 12h9'],
+      bolt: 'M13 2L5 14h6l-1 8 9-13h-6z',
+      flag: ['M5 21V4', 'M5 4h13l-2.5 4L18 12H5'],
+      play: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M10 8.5v7l5.5-3.5z'],
+      check: 'M5 12.5l4.5 4.5L19 7.5',
+      x: ['M6 6l12 12', 'M18 6L6 18'],
+      gavel: ['M13 5l6 6', 'M10 8l6 6', 'M3 21l8-8', 'M14.5 3.5l6 6'],
+      tag: ['M3 12V4h8l9 9-8 8z', 'M7 8h.01'],
+      stack: ['M4 8l8-4 8 4-8 4z', 'M4 12l8 4 8-4', 'M4 16l8 4 8-4'],
+      verified: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M8 12.5l2.5 2.5L16 9.5'],
+      party: ['M5 20l4-11 7 7z', 'M14 6l1-2', 'M18 9l2-1', 'M17 5l1.5-1.5'],
+      bookmark: 'M6 3h12v18l-6-4.5L6 21z',
+    };
+    const s = this.svg.bind(this);
+    return {
+      fire: s(P.fire, 15), trend: s(P.trend, 15), clock: s(P.clock, 15), funnel: s(P.funnel, 15), caret: s(P.caret, 14),
+      up: s(P.up, 16), down: s(P.down, 16), coin: s(P.coin, 16), coinSm: s(P.coin, 18), coinLg: s(P.coin, 36),
+      star: s(P.star, 16), starXs: s(P.star, 10, { fill: true }), starLg: s(P.star, 26), starXl: s(P.star, 44),
+      user: s(P.user, 22), trophy: s(P.trophy, 22), store: s(P.store, 22), smiley: s(P.smiley, 22),
+      plus: s(P.plus, 22), back: s(P.back, 20), pencil: s(P.pencil, 18), signOut: s(P.signOut, 18),
+      boltXs: s(P.bolt, 12, { fill: true }), flag: s(P.flag, 18), play: s(P.play, 18), check: s(P.check, 14), checkXs: s(P.check, 11, { sw: 2.4 }), x: s(P.x, 12),
+      gavel: s(P.gavel, 14), tag: s(P.tag, 14), stack: s(P.stack, 14),
+      bookmark: s(P.bookmark, 17), bookmarkFill: s(P.bookmark, 17, { fill: true }), bookmarkLg: s(P.bookmark, 19), bookmarkLgFill: s(P.bookmark, 19, { fill: true }),
+      tx: { AD_REWARD: s(P.play, 16), SUBMIT_FEE: s(P.pencil, 16), BOOST: s(P.bolt, 14, { fill: true }), STICKER_PURCHASE: s(P.store, 16), JOKE_APPROVED: s(P.verified, 16), WELCOME: s(P.party, 16) },
+    };
+  }
+
+  go(screen, param) { this.setState(s => ({ stack: [...s.stack, { screen: s.screen, param: s.param }].slice(-12), screen, param: param ?? null, catSheet: false, awardOpen: false, sortMenu: false, catPicker: false })); }
+  back() { this.setState(s => { const st = [...s.stack]; const prev = st.pop() || { screen: 'feed', param: null }; return { stack: st, screen: prev.screen, param: prev.param }; }); }
+  showToast(text) { clearTimeout(this._tt); this.setState({ toast: text }); this._tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+  vote(id, v) {
+    this.setState(s => ({ jokes: s.jokes.map(j => {
+      if (j.id !== id) return j;
+      const next = j.myVote === v ? null : v;
+      return { ...j, score: j.score - (j.myVote || 0) + (next || 0), myVote: next };
+    }) }));
+  }
+  catName(id) { const c = this.cats.find(c => c.id === id); return c ? c.name : ''; }
+  decorate(j, ic, metaTop) {
+    const muted = 'color-mix(in srgb, var(--color-text) 55%, transparent)';
+    const scoreColor = j.score > 0 ? 'var(--color-accent-300)' : j.score < 0 ? 'var(--color-neutral-500)' : muted;
+    const fav = this.state.favs.includes(j.id);
+    return {
+      fav, favColor: fav ? 'var(--color-accent)' : muted, favIcon: fav ? ic.bookmarkFill : ic.bookmark, favIconLg: fav ? ic.bookmarkLgFill : ic.bookmarkLg,
+      toggleFav: (e) => { e && e.stopPropagation(); this.setState(st => ({ favs: st.favs.includes(j.id) ? st.favs.filter(x => x !== j.id) : [...st.favs, j.id] })); this.showToast(fav ? 'Aus Favoriten entfernt.' : 'Als Favorit gemerkt.'); },
+      ...j, catName: this.catName(j.cat), author: this.users[j.authorId].nick, initial: this.users[j.authorId].nick.charAt(0).toUpperCase(), hasTitle: !!j.title, title: j.title || '',
+      hasStickers: j.stickers.length > 0, stickerList: j.stickers.map(([sid, n]) => ({ ...this.sticker(sid), count: n, multi: n > 1 })),
+      ring: j.boosted ? '0 0 0 1px var(--color-accent), 0 0 22px color-mix(in srgb, var(--color-accent) 18%, transparent)' : 'none',
+      boosted: !!j.boosted, metaTop, metaBottom: !metaTop,
+      upColor: j.myVote === 1 ? 'var(--color-accent)' : muted, downColor: j.myVote === -1 ? 'var(--color-accent)' : muted, scoreColor,
+      up: (e) => { e && e.stopPropagation(); if (j.status !== 'APPROVED') return; this.vote(j.id, 1); },
+      down: (e) => { e && e.stopPropagation(); if (j.status !== 'APPROVED') return; this.vote(j.id, -1); },
+      open: () => this.go('detail', j.id), openAuthor: (e) => { e && e.stopPropagation(); this.go('profile', j.authorId); },
+    };
+  }
+
+  renderVals() {
+    const s = this.state, ic = this.icons();
+    const themeProp = this.props.theme ?? 'dark';
+    const theme = themeProp === 'system' ? (s.systemDark ? 'dark' : 'light') : themeProp;
+    const metaTop = (this.props.metaPosition ?? 'top') === 'top';
+    const muted = 'color-mix(in srgb, var(--color-text) 55%, transparent)';
+    const on = 'var(--color-accent)', ring = 'inset 0 0 0 1px var(--color-accent)';
+    const seg = (v, cur) => ({ color: v === cur ? on : 'var(--color-text)', ring: v === cur ? ring : 'none' });
+    const hot = seg('HOT', s.sort), top = seg('TOP', s.sort), nw = seg('NEW', s.sort);
+    const day = seg('DAY', s.period), week = seg('WEEK', s.period), all = seg('ALL', s.period);
+
+    let feed = s.jokes.filter(j => j.status === 'APPROVED' && (!s.cats.length || s.cats.includes(j.cat)));
+    if (s.sort === 'TOP') feed = [...feed].sort((a, b) => b.score - a.score);
+    else if (s.sort === 'NEW') feed = [...feed].reverse();
+    else feed = [...feed].sort((a, b) => (b.boosted ? 1000 : 0) + b.score - ((a.boosted ? 1000 : 0) + a.score));
+    const feedJokes = feed.map(j => this.decorate(j, ic, metaTop));
+
+    const catOpts = [{ id: null, name: 'Alle' }, ...this.cats];
+    const picker = s.catPicker;
+    const sheetSource = picker ? this.cats : catOpts;
+    const sheetCats = sheetSource.map(c => {
+      const sel = picker ? s.subCat === c.id : (c.id === null ? s.cats.length === 0 : s.cats.includes(c.id));
+      const pick = picker ? () => this.setState({ subCat: c.id, catSheet: false, catPicker: false })
+        : c.id === null ? () => this.setState({ cats: [] })
+        : () => this.setState(st => ({ cats: st.cats.includes(c.id) ? st.cats.filter(x => x !== c.id) : [...st.cats, c.id] }));
+      return { name: c.name, pick, border: sel ? on : 'var(--color-divider)', color: sel ? on : 'var(--color-text)', dotRadius: picker ? '50%' : '4px', dotBorder: sel ? on : 'var(--color-divider)', dotBg: sel ? on : 'transparent', dotShadow: sel && picker ? 'inset 0 0 0 3px var(--color-surface)' : 'none', checked: sel && !picker };
+    });
+    const catCount = s.cats.length;
+    const filterLabel = catCount === 0 ? (s.sort === 'TOP' ? 'Alle · ' + periodLabels[s.period] : 'Alle') : catCount === 1 ? this.catName(s.cats[0]) : catCount + ' Kategorien';
+
+    const periodLabels = { DAY: 'Heute', WEEK: 'Woche', ALL: 'Immer' };
+
+    const dj = s.jokes.find(j => j.id === s.param) || s.jokes[0];
+    const detail = { ...this.decorate(dj, ic, false), initial: this.users[dj.authorId].nick.charAt(0).toUpperCase() };
+    const awardsRaw = s.awards[dj.id] || [];
+    const awards = awardsRaw.map(a => ({ ...this.sticker(a.sticker), giver: this.users[a.giverId].nick, time: a.time, msg: a.msg || '', hasMsg: !!a.msg, openGiver: () => this.go('profile', a.giverId) }));
+
+    const statusMap = { PENDING: ['In Prüfung', 'var(--color-neutral-900)', 'var(--color-neutral-100)'], APPROVED: ['Freigegeben', 'var(--color-accent-800)', 'var(--color-accent-100)'], REJECTED: ['Abgelehnt', 'var(--color-neutral-800)', 'var(--color-neutral-100)'] };
+    const myJokes = s.jokes.filter(j => j.authorId === 'u1').map(j => ({ ...this.decorate(j, ic, false), statusLabel: statusMap[j.status][0], statusBg: statusMap[j.status][1], statusColor: statusMap[j.status][2], hasReason: !!j.reason, reason: j.reason || '', canBoost: j.status === 'APPROVED' && !j.boosted, canWithdraw: j.status === 'PENDING',
+      boost: () => { if (s.balance < 50) return this.showToast('Zu wenig Gnöcken.'); this.setState(st => ({ balance: st.balance - 50, jokes: st.jokes.map(x => x.id === j.id ? { ...x, boosted: true } : x) })); this.showToast('Dein Witz ist jetzt geboostet!'); },
+      withdraw: () => { this.setState(st => ({ jokes: st.jokes.filter(x => x.id !== j.id) })); this.showToast('Witz zurückgezogen.'); } }));
+    const myStickers = this.stickerDefs.filter(d => s.owned[d.id]).map(d => ({ ...this.sticker(d.id), qty: s.owned[d.id] }));
+    const stickerTotal = Object.values(s.owned).reduce((a, b) => a + b, 0);
+
+    const pu = this.users[s.param] ? s.param : 'u2';
+    const pst = this.publicStickers[pu] || {};
+    const profile = { nick: this.users[pu].nick, bio: this.users[pu].bio, initial: this.users[pu].nick.charAt(0).toUpperCase(), karma: this.users[pu].karma.toLocaleString('de-AT'), jokes: this.users[pu].jokes,
+      stickers: this.stickerDefs.filter(d => pst[d.id]).map(d => ({ ...this.sticker(d.id), qty: pst[d.id] })), stickerTotal: Object.values(pst).reduce((a, b) => a + b, 0),
+      topJokes: s.jokes.filter(j => j.authorId === pu && j.status === 'APPROVED').sort((a, b) => b.score - a.score).slice(0, 3).map(j => ({ text: j.text, score: j.score, open: () => this.go('detail', j.id) })) };
+
+    const rankColor = (i) => i === 0 ? on : i < 3 ? 'var(--color-accent-300)' : muted;
+    const rankJokes = s.jokes.filter(j => j.status === 'APPROVED').sort((a, b) => b.score - a.score).slice(0, 6).map((j, i) => ({ ...this.decorate(j, ic, false), rank: i + 1, rankColor: rankColor(i) }));
+    const rankAuthors = Object.keys(this.users).sort((a, b) => this.users[b].karma - this.users[a].karma).map((id, i) => ({ rank: i + 1, rankColor: rankColor(i), nick: this.users[id].nick, initial: this.users[id].nick.charAt(0).toUpperCase(), jokes: this.users[id].jokes, karma: this.users[id].karma.toLocaleString('de-AT'), open: () => this.go('profile', id) }));
+
+    const market = this.stickerDefs.map(d => { const n = s.owned[d.id] || 0; return { ...this.sticker(d.id), desc: d.desc, opacity: d.soldOut ? 0.55 : 1, soldOut: !!d.soldOut, hasOwned: n > 0, ownedLabel: n + '× deins', hasStock: d.stock != null && !d.soldOut, stockLabel: 'Noch ' + d.stock + ' übrig', buyIcon: d.soldOut ? null : ic.coin, buyLabel: d.soldOut ? 'Ausverkauft' : String(d.price),
+      buy: () => { if (s.balance < d.price) return this.showToast('Zu wenig Gnöcken. Werbung ansehen?'); this.setState(st => ({ balance: st.balance - d.price, owned: { ...st.owned, [d.id]: (st.owned[d.id] || 0) + 1 } })); this.showToast('„' + d.name + '“ gehört jetzt dir!'); } }; });
+
+    const txLabels = { AD_REWARD: 'Werbung angesehen', SUBMIT_FEE: 'Witz eingereicht', BOOST: 'Boost', STICKER_PURCHASE: 'Sticker gekauft', JOKE_APPROVED: 'Witz freigegeben', WELCOME: 'Startguthaben' };
+    const transactions = this.txs.map(t => ({ label: txLabels[t.type], desc: t.desc, time: t.time, icon: ic.tx[t.type], amount: (t.amount > 0 ? '+' : '−') + Math.abs(t.amount), color: t.amount > 0 ? 'var(--color-accent-300)' : muted }));
+
+    const awardStickers = myStickers.map(m => ({ ...m, ring: s.awardPick === m.name ? '0 0 0 2px var(--color-accent)' : 'none', pick: () => this.setState({ awardPick: m.name }) }));
+    const subDisabled = !s.subText.trim() || !s.subCat;
+
+    const sc = s.screen;
+    const navColor = (k) => sc === k ? on : muted;
+    const tabStyle = (sel) => ({ border: sel ? on : 'var(--color-divider)', color: sel ? on : muted });
+    const favJokes = s.favs.map(id => s.jokes.find(j => j.id === id)).filter(Boolean).map(j => this.decorate(j, ic, false));
+    const meT1 = tabStyle(s.meTab === 'jokes'), meT2 = tabStyle(s.meTab === 'coll'), meT3 = tabStyle(s.meTab === 'favs'), rT1 = tabStyle(s.rankTab === 'jokes'), rT2 = tabStyle(s.rankTab === 'authors');
+
+    return {
+      ic, theme,
+      isFeed: sc === 'feed', isDetail: sc === 'detail', isMe: sc === 'me', isProfile: sc === 'profile', isRankings: sc === 'rankings', isMarket: sc === 'market', isWallet: sc === 'wallet', isSubmit: sc === 'submit', isLogin: sc === 'login', isRegister: sc === 'register',
+      showNav: !['login', 'register'].includes(sc),
+      navFeedColor: navColor('feed'), navRankColor: navColor('rankings'), navSubmitColor: navColor('submit'), navMarketColor: navColor('market'), navMeColor: ['me', 'wallet'].includes(sc) ? on : muted,
+      goFeed: () => this.go('feed'), goRankings: () => this.go('rankings'), goMarket: () => this.go('market'), goMe: () => this.go('me'), goWallet: () => this.go('wallet'), goSubmit: () => this.go('submit'), goLogin: () => this.go('login'), goRegister: () => this.go('register'),
+      back: () => this.back(), logout: () => this.go('login'), login: () => { this.go('feed'); this.showToast('Willkommen zurück, witzbold_88.'); },
+      toast: () => this.showToast('Im Prototyp nicht enthalten.'),
+      balance: s.balance,
+      sortHot: () => this.setState({ sort: 'HOT' }), sortTop: () => this.setState({ sort: 'TOP' }), sortNew: () => this.setState({ sort: 'NEW' }),
+      hotColor: hot.color, hotRing: hot.ring, topColor: top.color, topRing: top.ring, newColor: nw.color, newRing: nw.ring,
+      periodDay: () => this.setState({ period: 'DAY' }), periodWeek: () => this.setState({ period: 'WEEK' }), periodAll: () => this.setState({ period: 'ALL' }),
+      dayColor: day.color, dayRing: day.ring, weekColor: week.color, weekRing: week.ring, allColor: all.color, allRing: all.ring,
+      filterLabel, filterBorder: catCount ? on : 'var(--color-divider)', filterColor: catCount ? on : 'var(--color-text)',
+      openCatSheet: () => this.setState({ catSheet: true, catPicker: false }), openCatPicker: () => this.setState({ catSheet: true, catPicker: true }),
+      closeSheets: () => this.setState({ catSheet: false, awardOpen: false, catPicker: false }),
+      catSheetOpen: s.catSheet, sheetTitle: picker ? 'Kategorie wählen' : 'Feed filtern', sheetCats, sheetShowsPeriod: !picker && s.sort === 'TOP',
+      feedJokes, feedEmpty: feedJokes.length === 0,
+      detail, awards, awardCount: awards.length, noAwards: awards.length === 0,
+      openAward: () => { if (dj.authorId === 'u1') return this.showToast('Eigene Witze kannst du nicht auszeichnen.'); this.setState({ awardOpen: true, awardPick: null }); },
+      awardOpen: s.awardOpen, awardStickers, awardDisabled: !s.awardPick, awardOpacity: s.awardPick ? 1 : 0.45,
+      giveAward: () => { const d = this.stickerDefs.find(x => x.name === s.awardPick); this.setState(st => ({ awardOpen: false, owned: { ...st.owned, [d.id]: st.owned[d.id] - 1 }, awards: { ...st.awards, [dj.id]: [{ sticker: d.id, giverId: 'u1', time: 'gerade eben' }, ...(st.awards[dj.id] || [])] }, jokes: st.jokes.map(x => x.id === dj.id ? { ...x, stickers: x.stickers.some(p => p[0] === d.id) ? x.stickers.map(p => p[0] === d.id ? [p[0], p[1] + 1] : p) : [...x.stickers, [d.id, 1]] } : x) })); this.showToast('Sticker verliehen!'); },
+      meTabJokes: () => this.setState({ meTab: 'jokes' }), meTabColl: () => this.setState({ meTab: 'coll' }), meShowJokes: s.meTab === 'jokes', meShowColl: s.meTab === 'coll',
+      meTab1Border: meT1.border, meTab1Color: meT1.color, meTab2Border: meT2.border, meTab2Color: meT2.color, meTab3Border: meT3.border, meTab3Color: meT3.color,
+      meTabFavs: () => this.setState({ meTab: 'favs' }), meShowFavs: s.meTab === 'favs', favJokes, noFavs: favJokes.length === 0, hasFavs: favJokes.length > 0, favCount: favJokes.length,
+      myJokes, myStickers, stickerTotal, profile,
+      rankTabJokes: () => this.setState({ rankTab: 'jokes' }), rankTabAuthors: () => this.setState({ rankTab: 'authors' }), rankShowJokes: s.rankTab === 'jokes', rankShowAuthors: s.rankTab === 'authors',
+      rTab1Border: rT1.border, rTab1Color: rT1.color, rTab2Border: rT2.border, rTab2Color: rT2.color, rankJokes, rankAuthors,
+      market, transactions,
+      watchAd: () => { this.setState(st => ({ balance: st.balance + 10 })); this.showToast('+10 Gnöcken gutgeschrieben!'); },
+      pickLabel: s.subCat ? this.catName(s.subCat) : 'Kategorie wählen', pickColor: s.subCat ? 'var(--color-text)' : muted,
+      subTitle: s.subTitle, subText: s.subText, subLen: s.subText.length, setSubTitle: (e) => this.setState({ subTitle: e.target.value }), setSubText: (e) => this.setState({ subText: e.target.value }),
+      subDisabled, subOpacity: subDisabled ? 0.45 : 1,
+      submitJoke: () => { if (s.balance < 20) return this.showToast('Zu wenig Gnöcken.'); this.setState(st => ({ balance: st.balance - 20, jokes: [...st.jokes, { id: 'j' + Date.now(), title: st.subTitle.trim() || undefined, text: st.subText.trim(), cat: st.subCat, authorId: 'u1', time: 'gerade eben', score: 0, myVote: null, stickers: [], status: 'PENDING' }], subTitle: '', subText: '', subCat: null })); this.go('me'); this.showToast('Eingereicht! Nach der Freigabe erscheint dein Witz im Feed.'); },
+      toastVisible: !!s.toast, toastText: s.toast || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

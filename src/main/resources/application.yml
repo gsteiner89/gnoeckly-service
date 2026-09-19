@@ -1,0 +1,70 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${GNOECKLY_DB_URL:jdbc:postgresql://localhost:5432/gnoeckly}
+    # Bewusst kein Default fuer User/Passwort (wie midgard.security.jwt.secret) - echte
+    # Zugangsdaten gehoeren nicht als Klartext in eine versionierte Datei.
+    username: ${GNOECKLY_DB_USER}
+    password: ${GNOECKLY_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    # TenantFilter und DefaultTenantFilter brauchen Open-Session-in-View (siehe midgard-core
+    # TenantFilter-Javadoc).
+    open-in-view: true
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      # Sticker-Bilder (Admin-Upload); StickerService prueft zusaetzlich 512 KB fachlich.
+      max-file-size: 1MB
+      max-request-size: 2MB
+
+midgard:
+  security:
+    jwt:
+      secret: ${MIDGARD_JWT_SECRET:}
+      # Mobile-App: etwas laenger als midgards 15-Minuten-Default, Refresh-Token bleibt 7 Tage.
+      access-token-ttl: 30m
+    # Oeffentliche Lese-Endpoints (Feed, Kategorien, Rankings, Sticker-Katalog/-Bilder, Profile),
+    # Registrierung und der AdMob-SSV-Callback laufen ohne Token. Tenant kommt dann vom
+    # DefaultTenantFilter (siehe dort).
+    public-paths:
+      - /api/v1/public/**
+      - /actuator/health
+    # Midgards Stammdaten-Endpoints tragen kein @PreAuthorize (midgard CLAUDE.md Regel 10). Mit
+    # Self-Registration haette sonst jeder Gnoeckly-User Zugriff auf User-/Gruppen-/Menue-/
+    # SystemOption-Verwaltung (z.B. PUT /api/v1/system-options -> gnoeckly.submitFee=0).
+    superadmin-paths:
+      - /api/v1/users/**
+      - /api/v1/groups/**
+      - /api/v1/menu-items/**
+      - /api/v1/menu-categories/**
+      - /api/v1/modules/**
+      - /api/v1/system-options/**
+    cors:
+      # Capacitor-Origins: Android = http://localhost, iOS = capacitor://localhost; ng serve = :4200.
+      allowed-origins: ${GNOECKLY_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost,capacitor://localhost}
+  # Tenant, Kategorien und Sticker legt GnoecklySeedRunner bei jedem Start an. Den Superadmin fuer
+  # die Moderation gibt es erst, sobald email/password gesetzt sind (beim naechsten Start, auch
+  # nachtraeglich). tenant-slug nie aendern: DefaultTenantFilter haengt daran.
+  bootstrap-admin:
+    email: ${MIDGARD_BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${MIDGARD_BOOTSTRAP_ADMIN_PASSWORD:}
+    tenant-name: Gnoeckly
+    tenant-slug: gnoeckly
+  storage:
+    local:
+      base-path: ${GNOECKLY_STORAGE_PATH:./data/storage}
+
+gnoeckly:
+  admob:
+    ssv:
+      verifier-keys-url: https://www.gstatic.com/admob/reward/verifier-keys.json
+      key-cache-ttl: 12h
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs

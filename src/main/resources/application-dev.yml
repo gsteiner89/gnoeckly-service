@@ -1,0 +1,19 @@
+# Lokale Entwicklung: Swagger-UI/OpenAPI ohne Token, AdMob-SSV gegen lokal erzeugten Testkey.
+midgard:
+  security:
+    public-paths:
+      - /api/v1/public/**
+      - /actuator/health
+      - /v3/api-docs/**
+      - /swagger-ui/**
+      - /swagger-ui.html
+
+gnoeckly:
+  admob:
+    ssv:
+      # Siehe docs/admob-ssv-lokal.md: Testkey mit dem SsvSignTool generieren und hier eintragen.
+      verifier-keys-url: classpath:admob-test-keys.json
+
+logging:
+  level:
+    at.stoneforge: DEBUG

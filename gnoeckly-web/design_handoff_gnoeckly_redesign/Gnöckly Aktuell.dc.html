@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400..700,0..1,0&display=swap">
+<style>
+body{margin:0;background:#e6e4ea;font-family:Roboto,system-ui,sans-serif}
+a{color:#5f52a8}a:hover{color:#463a8f}
+.ms{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+.ms.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+</style>
+</helmet>
+<div style="padding:40px 44px;display:flex;flex-direction:column;gap:20px;color:#1b1b21">
+  <div style="max-width:720px;display:flex;flex-direction:column;gap:6px">
+    <div style="font:600 10px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#6b6880">IST-ZUSTAND · Nachbau aus gnoeckly-web (Angular Material 3, Violett/Orange, Roboto)</div>
+    <div style="font:500 20px/1.3 Roboto,sans-serif">Gnöckly heute</div>
+    <div style="font:400 13px/1.5 Roboto,sans-serif;color:#47464f">Nachgebaut aus feed.page.ts, me.page.ts, public-profile.page.ts, joke-detail.page.ts, joke-card.ts, app.ts und styles.scss. Beobachtungen: Sortierung + Kategorien belegen zwei volle Reihen (≈ 100 px) über dem Feed; Kategorie-Chips werden abgeschnitten. Im Profil brechen die drei Stat-Kacheln und die Admin-Buttons auf 360 px; Badge-Reihe im öffentlichen Profil bricht ungleichmäßig um. Die Karte stellt Meta-Daten (Autor, Zeit, Badges) vor den Witz, obwohl der Witz das Wichtigste ist.</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:500 12px Roboto,sans-serif;color:#47464f">Feed</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 412 }}" height="{{ 892 }}" hint-size="412px,892px">
+        <div style="height:100%;display:flex;flex-direction:column;background:#fcf8ff;color:#1b1b21;font-family:Roboto,system-ui,sans-serif;position:relative">
+          <header style="display:flex;align-items:center;gap:4px;min-height:56px;padding:0 4px;background:#f0ecf7">
+            <div style="flex:1;font-size:20px;font-weight:500;padding-left:12px">Gnöckly</div>
+            <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">toll</span></div>
+          </header>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+            <div style="display:flex;gap:12px;padding:12px 16px 4px;overflow:hidden">
+              <div style="display:inline-flex;height:40px;border:1px solid #78767f;border-radius:999px;overflow:hidden;flex-shrink:0;font-size:14px;font-weight:500">
+                <div style="display:flex;align-items:center;gap:6px;padding:0 14px;background:#e4dff5;color:#1c1a2d"><span class="ms" style="font-size:18px">local_fire_department</span>Heiß</div>
+                <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid #78767f"><span class="ms" style="font-size:18px">trending_up</span>Top</div>
+                <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid #78767f"><span class="ms" style="font-size:18px">schedule</span>Neu</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;padding:4px 16px;overflow:hidden;white-space:nowrap">
+              <div style="display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 8px;border-radius:8px;background:#e4dff5;font-size:14px;font-weight:500;color:#1c1a2d;flex-shrink:0"><span class="ms" style="font-size:18px">check</span>Alle</div>
+              <div style="display:inline-flex;align-items:center;height:32px;padding:0 16px;border-radius:8px;border:1px solid #c8c5d0;font-size:14px;font-weight:500;flex-shrink:0">Flachwitze</div>
+              <div style="display:inline-flex;align-items:center;height:32px;padding:0 16px;border-radius:8px;border:1px solid #c8c5d0;font-size:14px;font-weight:500;flex-shrink:0">Schwarzer Humor</div>
+              <div style="display:inline-flex;align-items:center;height:32px;padding:0 16px;border-radius:8px;border:1px solid #c8c5d0;font-size:14px;font-weight:500;flex-shrink:0">Büro</div>
+              <div style="display:inline-flex;align-items:center;height:32px;padding:0 16px;border-radius:8px;border:1px solid #c8c5d0;font-size:14px;font-weight:500;flex-shrink:0">Tiere</div>
+            </div>
+            <section style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <article style="background:#f0ecf7;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 0 0 2px #8f4c00">
+                <header style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
+                  <span style="font-weight:500;color:#5f52a8">witzbold_88</span><span style="color:#47464f">· vor 2 h</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d">Flachwitze</span>
+                  <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;background:#ffdcc2;color:#2e1500"><span class="ms" style="font-size:14px">bolt</span>Geboostet</span>
+                </header>
+                <div><h3 style="margin:0;font-size:18px;font-weight:500">Bäckerei</h3><p style="margin:4px 0 0;font-size:16px;line-height:1.45">Was macht ein Clown im Büro? Faxen.</p></div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Lachträne<span style="font-weight:500;color:#5f52a8">3</span></span>
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Goldene Gans<span style="font-weight:500;color:#5f52a8">1</span></span>
+                </div>
+                <footer style="display:flex;align-items:center;gap:8px">
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms fill" style="color:#5f52a8">arrow_upward</span></div>
+                  <span style="min-width:28px;text-align:center;font-weight:500;color:#5f52a8">128</span>
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_downward</span></div>
+                </footer>
+              </article>
+              <article style="background:#f0ecf7;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
+                <header style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
+                  <span style="font-weight:500;color:#5f52a8">frau_holle</span><span style="color:#47464f">· vor 5 h</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d">Schwarzer Humor</span>
+                </header>
+                <div><p style="margin:4px 0 0;font-size:16px;line-height:1.45">Mein Arzt sagt, ich soll mehr auf mein Herz hören. Jetzt sitze ich hier und höre nur „Pizza“.</p></div>
+                <footer style="display:flex;align-items:center;gap:8px">
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_upward</span></div>
+                  <span style="min-width:28px;text-align:center;font-weight:500;color:#5f52a8">64</span>
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_downward</span></div>
+                </footer>
+              </article>
+              <article style="background:#f0ecf7;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
+                <header style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
+                  <span style="font-weight:500;color:#5f52a8">der_kalauer</span><span style="color:#47464f">· gestern</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d">Büro</span>
+                </header>
+                <div><p style="margin:4px 0 0;font-size:16px;line-height:1.45">Chef: „Sie kommen schon wieder zu spät!“ – „Ja, aber ich gehe dafür auch früher.“</p></div>
+                <footer style="display:flex;align-items:center;gap:8px">
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_upward</span></div>
+                  <span style="min-width:28px;text-align:center;font-weight:500;color:#5f52a8">41</span>
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_downward</span></div>
+                </footer>
+              </article>
+            </section>
+          </div>
+          <div style="position:absolute;right:16px;bottom:80px;display:inline-flex;align-items:center;gap:8px;height:56px;padding:0 20px 0 16px;border-radius:16px;background:#e5deff;color:#1b0f5c;font-size:16px;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.3),0 4px 8px rgba(0,0,0,.15)"><span class="ms">add</span>Witz einreichen</div>
+          <nav style="display:grid;grid-template-columns:repeat(4,1fr);height:64px;background:#f0ecf7;box-shadow:0 -1px 0 #c8c5d0;font-size:12px;font-weight:500;color:#47464f">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#1b1b21"><span class="ms fill" style="padding:4px 20px;border-radius:16px;background:#e4dff5;color:#1c1a2d">sentiment_very_satisfied</span>Witze</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">leaderboard</span>Rangliste</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">storefront</span>Sticker</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">person</span>Ich</div>
+          </nav>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:500 12px Roboto,sans-serif;color:#47464f">Profil (eigenes, Admin) – bei 360 px CSS-Breite</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 360 }}" height="{{ 800 }}" hint-size="360px,800px">
+        <div style="height:100%;display:flex;flex-direction:column;background:#fcf8ff;color:#1b1b21;font-family:Roboto,system-ui,sans-serif">
+          <header style="display:flex;align-items:center;gap:4px;min-height:56px;padding:0 4px;background:#f0ecf7">
+            <div style="flex:1;font-size:20px;font-weight:500;padding-left:12px">Ich</div>
+            <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">edit</span></div>
+            <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">logout</span></div>
+          </header>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding-top:16px">
+            <div style="display:flex;align-items:center;gap:12px;padding:0 16px">
+              <div style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:700;background:#e5deff;color:#1b0f5c">W</div>
+              <div style="flex:1"><div style="font-size:20px;font-weight:500">witzbold_88</div><div style="font-size:13px;color:#47464f">Lacht über eigene Witze. Immer.</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px;border-radius:12px;background:#f0ecf7;font-size:12px"><span class="ms">toll</span><b style="font-size:18px">120</b><span>Gnöcken</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px;border-radius:12px;background:#f0ecf7;font-size:12px"><span class="ms">whatshot</span><b style="font-size:18px">1.340</b><span>Karma</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px;border-radius:12px;background:#f0ecf7;font-size:12px"><span class="ms">star</span><b style="font-size:18px">12</b><span>Sticker</span></div>
+            </div>
+            <div style="display:flex;gap:8px;padding:4px 16px;overflow:hidden;white-space:nowrap">
+              <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 24px 0 16px;border:1px solid #78767f;border-radius:999px;color:#5f52a8;font-size:14px;font-weight:500;flex-shrink:0"><span class="ms" style="font-size:18px">gavel</span>Moderation</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 24px 0 16px;border:1px solid #78767f;border-radius:999px;color:#5f52a8;font-size:14px;font-weight:500;flex-shrink:0"><span class="ms" style="font-size:18px">sell</span>Kategorien</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 24px 0 16px;border:1px solid #78767f;border-radius:999px;color:#5f52a8;font-size:14px;font-weight:500;flex-shrink:0"><span class="ms" style="font-size:18px">note_stack</span>Sticker verwalten</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;height:48px;border-bottom:1px solid #c8c5d0;font-size:14px;font-weight:500;color:#47464f">
+              <div style="display:grid;place-items:center;position:relative;color:#5f52a8">Meine Witze<span style="position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:72px;height:3px;border-radius:3px 3px 0 0;background:#5f52a8"></span></div>
+              <div style="display:grid;place-items:center">Sammlung</div>
+            </div>
+            <div style="padding:12px 16px;display:flex;flex-direction:column;gap:12px">
+              <article style="background:#f0ecf7;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
+                <header style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
+                  <span style="font-weight:500;color:#5f52a8">witzbold_88</span><span style="color:#47464f">· vor 2 h</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d">Flachwitze</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e5deff;color:#1b0f5c">Freigegeben</span>
+                </header>
+                <div><h3 style="margin:0;font-size:18px;font-weight:500">Bäckerei</h3><p style="margin:4px 0 0;font-size:16px;line-height:1.45">Was macht ein Clown im Büro? Faxen.</p></div>
+                <footer style="display:flex;align-items:center;gap:8px">
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_upward</span></div>
+                  <span style="min-width:28px;text-align:center;font-weight:500;color:#5f52a8">128</span>
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_downward</span></div>
+                  <span style="flex:1"></span>
+                  <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;color:#5f52a8;font-size:14px;font-weight:500;white-space:nowrap"><span class="ms" style="font-size:18px">bolt</span>Boost (50 Gnöcken, 24 h)</div>
+                </footer>
+              </article>
+              <article style="background:#f0ecf7;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px">
+                <header style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
+                  <span style="font-weight:500;color:#5f52a8">witzbold_88</span><span style="color:#47464f">· vor 20 min</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d">Tiere</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d">In Prüfung</span>
+                </header>
+                <div><p style="margin:4px 0 0;font-size:16px;line-height:1.45">Treffen sich zwei Jäger. Beide tot.</p></div>
+                <footer style="display:flex;align-items:center;gap:8px;opacity:.6">
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_upward</span></div>
+                  <span style="min-width:28px;text-align:center;font-weight:500">0</span>
+                  <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_downward</span></div>
+                </footer>
+              </article>
+            </div>
+          </div>
+          <nav style="display:grid;grid-template-columns:repeat(4,1fr);height:64px;background:#f0ecf7;box-shadow:0 -1px 0 #c8c5d0;font-size:12px;font-weight:500;color:#47464f">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">sentiment_very_satisfied</span>Witze</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">leaderboard</span>Rangliste</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">storefront</span>Sticker</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#1b1b21"><span class="ms fill" style="padding:4px 20px;border-radius:16px;background:#e4dff5;color:#1c1a2d">person</span>Ich</div>
+          </nav>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:500 12px Roboto,sans-serif;color:#47464f">Öffentliches Profil</div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 360 }}" height="{{ 800 }}" hint-size="360px,800px">
+        <div style="height:100%;display:flex;flex-direction:column;background:#fcf8ff;color:#1b1b21;font-family:Roboto,system-ui,sans-serif">
+          <header style="display:flex;align-items:center;gap:4px;min-height:56px;padding:0 4px;background:#f0ecf7">
+            <div style="width:48px;height:48px;display:grid;place-items:center"><span class="ms">arrow_back</span></div>
+            <div style="flex:1;font-size:20px;font-weight:500;padding-left:12px">frau_holle</div>
+          </header>
+          <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:700;background:#e5deff;color:#1b0f5c">F</div>
+              <div><div style="font-size:20px;font-weight:500">frau_holle</div><div style="font-size:13px;color:#47464f">Schüttelt Witze wie Kissen.</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d"><span class="ms" style="font-size:16px">whatshot</span>2.410 Karma</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;background:#e4dff5;color:#1c1a2d"><span class="ms" style="font-size:16px">sentiment_very_satisfied</span>37 Witze</span>
+            </div>
+            <h3 style="margin:0;font-size:18px;font-weight:500">Sammlung</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Lachträne<span style="font-weight:500;color:#5f52a8">14</span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Goldene Gans<span style="font-weight:500;color:#5f52a8">3</span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Trockener Keks<span style="font-weight:500;color:#5f52a8">9</span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Kronjuwel<span style="font-weight:500;color:#5f52a8">1</span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Zwerchfellbruch<span style="font-weight:500;color:#5f52a8">6</span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 4px;border-radius:999px;background:#eae6f1;font-size:13px"><span class="ms" style="font-size:20px;color:#8f4c00">star</span>Ehrenrunde<span style="font-weight:500;color:#5f52a8">2</span></span>
+            </div>
+          </div>
+          <nav style="display:grid;grid-template-columns:repeat(4,1fr);height:64px;background:#f0ecf7;box-shadow:0 -1px 0 #c8c5d0;font-size:12px;font-weight:500;color:#47464f">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">sentiment_very_satisfied</span>Witze</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">leaderboard</span>Rangliste</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">storefront</span>Sticker</div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span class="ms" style="padding:4px 20px">person</span>Ich</div>
+          </nav>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

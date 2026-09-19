@@ -1,0 +1,30 @@
+# Test-Profil: liegt ueber der echten application.yml (public-paths/superadmin-paths werden so
+# mitgetestet). Datasource kommt aus EmbeddedPostgresTestSupport (@DynamicPropertySource).
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: true
+  flyway:
+    enabled: true
+
+midgard:
+  security:
+    jwt:
+      secret: test-secret-value-at-least-32-bytes-long-1234567890
+  # GnoecklySeedRunner legt beim Context-Start Default-Tenant, Kategorien, Beispiel-Sticker und
+  # (wegen email/password) den Superadmin an - jeder IT findet sie vor.
+  bootstrap-admin:
+    email: admin@gnoeckly.test
+    password: Test1234!
+    tenant-name: Gnoeckly Test
+    tenant-slug: gnoeckly
+  storage:
+    local:
+      base-path: build/test-storage
+
+gnoeckly:
+  admob:
+    ssv:
+      # AdMobSsvIT ueberschreibt den KeyProvider per @Primary-Bean; nie gegen Google im Test.
+      verifier-keys-url: classpath:does-not-exist.json
