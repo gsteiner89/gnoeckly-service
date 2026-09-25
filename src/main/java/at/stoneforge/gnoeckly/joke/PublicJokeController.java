@@ -34,10 +34,11 @@ public class PublicJokeController {
     public PagedResponse<JokeResponse> feed(@RequestParam(defaultValue = "HOT") FeedSort sort,
                                             @RequestParam(defaultValue = "ALL") Period period,
                                             @RequestParam(required = false) List<UUID> categoryIds,
+                                            @RequestParam(defaultValue = "false") boolean favoritesOnly,
                                             @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "20") int size,
                                             @AuthenticationPrincipal UUID viewerId) {
-        return jokeService.feed(sort, period, categoryIds, viewerId, PageRequest.of(page, Math.min(size, 100)));
+        return jokeService.feed(sort, period, categoryIds, favoritesOnly, viewerId, PageRequest.of(page, Math.min(size, 100)));
     }
 
     @GetMapping("/{id}")

@@ -22,7 +22,7 @@ type MeTab = 'jokes' | 'favs' | 'coll';
   selector: 'gn-me',
   imports: [MatIconModule, RouterLink, JokeCard, JokeCompact, PageHeader, StickerTile],
   template: `
-    <gn-page-header [title]="t.me.title">
+    <gn-page-header [title]="t.me.title" [back]="true">
       <button type="button" class="gn-icon-btn" (click)="editProfile()" aria-label="Profil bearbeiten"><mat-icon>edit</mat-icon></button>
       <button type="button" class="gn-icon-btn" (click)="auth.logout()" aria-label="Abmelden"><mat-icon>logout</mat-icon></button>
     </gn-page-header>

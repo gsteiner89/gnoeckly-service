@@ -10,11 +10,14 @@ export interface CategorySheetData {
   single?: boolean;
   /** Nur im Feed bei Sort = Top: Zeitraum-Auswahl. */
   period?: Period | null;
+  /** Nur im Feed und nur eingeloggt: Zustand des Favoriten-Toggles; undefined blendet ihn aus. */
+  favoritesOnly?: boolean;
 }
 
 export interface CategorySheetResult {
   selected: string[];
   period: Period | null;
+  favoritesOnly: boolean;
 }
 
 /** Bottom-Sheet fuer Kategorie-Filter (Mehrfach) bzw. Kategorie-Auswahl (einzeln). */
@@ -36,6 +39,11 @@ export interface CategorySheetResult {
           </button>
         }
       </div>
+      @if (data.favoritesOnly !== undefined) {
+        <button type="button" class="opt fav" [class.on]="favoritesOnly()" (click)="favoritesOnly.set(!favoritesOnly())">
+          <span class="box"></span>{{ t.feed.favorites }}
+        </button>
+      }
       @if (data.period) {
         <div class="gn-label section">{{ t.feed.periodTitle }}</div>
         <div class="segment">
@@ -58,6 +66,7 @@ export interface CategorySheetResult {
       font: inherit; font-size: 14px; text-align: left; cursor: pointer;
     }
     .opt.on { border-color: var(--color-accent); }
+    .fav { width: 100%; margin-top: 8px; }
     .box {
       flex: none; width: 16px; height: 16px; border-radius: 4px; box-sizing: border-box;
       border: 1px solid var(--color-neutral-600); display: grid; place-items: center;
@@ -92,6 +101,7 @@ export class CategorySheet {
   protected readonly single = !!this.data.single;
   protected readonly selected = signal<string[]>([...this.data.selected]);
   protected readonly period = signal<Period>(this.data.period ?? 'WEEK');
+  protected readonly favoritesOnly = signal(!!this.data.favoritesOnly);
   protected readonly periods: { value: Period; label: string }[] = [
     { value: 'DAY', label: T.feed.day },
     { value: 'WEEK', label: T.feed.week },
@@ -108,6 +118,10 @@ export class CategorySheet {
   }
 
   protected close(): void {
-    this.ref.dismiss({ selected: this.selected(), period: this.data.period ? this.period() : null } satisfies CategorySheetResult);
+    this.ref.dismiss({
+      selected: this.selected(),
+      period: this.data.period ? this.period() : null,
+      favoritesOnly: this.favoritesOnly(),
+    } satisfies CategorySheetResult);
   }
 }

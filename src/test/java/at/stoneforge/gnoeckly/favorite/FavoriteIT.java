@@ -74,6 +74,21 @@ class FavoriteIT extends GnoecklyIntegrationTestBase {
         assertThat(miss.get("totalElements").asInt()).isZero();
     }
 
+    @Test
+    void feedFavoritesOnly() throws Exception {
+        GnoecklyTestData.TestUser author = testData.registerUser();
+        GnoecklyTestData.TestUser fan = testData.registerUser();
+        UUID kept = testData.approvedJoke(author, "Favorit " + UUID.randomUUID());
+        UUID other = testData.approvedJoke(author, "Kein Favorit " + UUID.randomUUID());
+        favorite(kept, fan);
+
+        JsonNode mine = testData.perform(get("/api/v1/public/jokes?favoritesOnly=true&size=100").header("Authorization", fan.bearer()), 200);
+        assertThat(ids(mine)).containsExactly(kept.toString());
+        assertThat(ids(testData.perform(get("/api/v1/public/jokes?favoritesOnly=true").header("Authorization", author.bearer()), 200))).isEmpty();
+        assertThat(ids(testData.perform(get("/api/v1/public/jokes?favoritesOnly=true"), 200))).isEmpty();
+        assertThat(ids(testData.perform(get("/api/v1/public/jokes?size=100").header("Authorization", fan.bearer()), 200))).contains(kept.toString(), other.toString());
+    }
+
     private void favorite(UUID jokeId, GnoecklyTestData.TestUser user) throws Exception {
         mockMvc.perform(post("/api/v1/jokes/" + jokeId + "/favorite").header("Authorization", user.bearer()))
                 .andExpect(status().isNoContent());

@@ -21,6 +21,7 @@ import { PullToRefreshDirective } from '../../shared/pull-to-refresh.directive';
         <a class="pill" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
         <a class="pill" routerLink="/wallet" aria-label="Gnöcken"><mat-icon>toll</mat-icon>{{ auth.me()?.balance ?? 0 }}</a>
       }
+      <a class="gn-icon-btn" [routerLink]="auth.isLoggedIn() ? '/me' : '/auth/login'" [attr.aria-label]="t.nav.me"><mat-icon>account_circle</mat-icon></a>
     </gn-page-header>
 
     <div class="filters">
@@ -59,7 +60,7 @@ import { PullToRefreshDirective } from '../../shared/pull-to-refresh.directive';
     .pill mat-icon, .segment mat-icon { width: 15px; height: 15px; font-size: 15px; }
     .pill mat-icon { color: var(--color-accent); }
 
-    .filters { display: flex; align-items: center; gap: 8px; padding: 4px 16px 10px; max-width: 640px; margin: 0 auto; box-sizing: border-box; }
+    .filters { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; max-width: 640px; margin: 0 auto; box-sizing: border-box; }
     .segment { display: inline-flex; height: 36px; border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider); }
     .segment button {
       display: inline-flex; align-items: center; gap: 4px; padding: 0 10px; border: 0; border-radius: var(--gn-radius);
@@ -91,15 +92,19 @@ export class FeedPage {
   readonly sort = signal<FeedSort>('HOT');
   readonly period = signal<Period>('WEEK');
   readonly categoryIds = signal<string[]>([]);
+  readonly favoritesOnly = signal(false);
   readonly categories = signal<JokeCategory[]>([]);
   readonly jokes = signal<Joke[]>([]);
   readonly loading = signal(false);
   readonly hasMore = signal(false);
   private page = 0;
 
-  protected readonly filterActive = computed(() => this.categoryIds().length > 0 || (this.sort() === 'TOP' && this.period() !== 'ALL'));
+  protected readonly filterActive = computed(() => this.categoryIds().length > 0 || this.favoritesOnly() || (this.sort() === 'TOP' && this.period() !== 'ALL'));
   protected readonly filterLabel = computed(() => {
     const ids = this.categoryIds();
+    if (this.favoritesOnly() && ids.length === 0) {
+      return T.feed.favorites;
+    }
     const base = ids.length === 0 ? T.feed.all
       : ids.length === 1 ? (this.categories().find((c) => c.id === ids[0])?.name ?? T.feed.all)
       : T.feed.categoriesN(ids.length);
@@ -115,6 +120,7 @@ export class FeedPage {
       this.sort();
       this.period();
       this.categoryIds();
+      this.favoritesOnly();
       untracked(() => void this.reload());
     });
   }
@@ -124,12 +130,16 @@ export class FeedPage {
       categories: this.categories(),
       selected: this.categoryIds(),
       period: this.sort() === 'TOP' ? this.period() : null,
+      favoritesOnly: this.auth.isLoggedIn() ? this.favoritesOnly() : undefined,
     };
     this.sheet.open<CategorySheet, CategorySheetData, CategorySheetResult>(CategorySheet, { data }).afterDismissed().subscribe((result) => {
       if (!result) {
         return;
       }
       this.categoryIds.set(result.selected);
+      if (this.auth.isLoggedIn()) {
+        this.favoritesOnly.set(result.favoritesOnly);
+      }
       if (result.period) {
         this.period.set(result.period);
       }
@@ -153,7 +163,7 @@ export class FeedPage {
   private async load(reset: boolean): Promise<void> {
     this.loading.set(true);
     try {
-      const result = await this.api.feed(this.sort(), this.sort() === 'TOP' ? this.period() : 'ALL', this.categoryIds(), this.page);
+      const result = await this.api.feed(this.sort(), this.sort() === 'TOP' ? this.period() : 'ALL', this.categoryIds(), this.page, this.favoritesOnly());
       this.jokes.update((list) => (reset ? result.content : [...list, ...result.content]));
       this.hasMore.set(result.page + 1 < result.totalPages);
     } catch (error) {

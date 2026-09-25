@@ -110,7 +110,10 @@ html, body {
   gap: 4px;
   min-height: var(--gn-header-height);
   padding: var(--gn-safe-top) 4px 0 4px;
-  background: var(--color-bg);
+  // Leicht heller als der Seitenhintergrund + Trennlinie/Schatten, damit der Header vom Inhalt abgesetzt ist
+  background: color-mix(in srgb, var(--color-surface) 80%, var(--color-bg));
+  border-bottom: 1px solid var(--color-divider);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
   color: var(--color-text);
 }
 

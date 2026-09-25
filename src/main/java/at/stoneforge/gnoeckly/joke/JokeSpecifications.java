@@ -1,9 +1,12 @@
 package at.stoneforge.gnoeckly.joke;
 
+import at.stoneforge.gnoeckly.favorite.JokeFavorite;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
@@ -24,8 +27,26 @@ public final class JokeSpecifications {
     }
 
     public static Specification<Joke> approvedFeed(Collection<UUID> categoryIds, Instant since, FeedSort sort, Instant now) {
+        return approvedFeed(categoryIds, since, sort, now, false, null);
+    }
+
+    /** {@code favoritesOnly}: nur Witze, die {@code viewerId} favorisiert hat; ohne Viewer bleibt die Liste leer. */
+    public static Specification<Joke> approvedFeed(Collection<UUID> categoryIds, Instant since, FeedSort sort, Instant now,
+                                                   boolean favoritesOnly, UUID viewerId) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            if (favoritesOnly) {
+                if (viewerId == null) {
+                    predicates.add(cb.disjunction());
+                } else {
+                    Subquery<UUID> favorites = query.subquery(UUID.class);
+                    Root<JokeFavorite> favorite = favorites.from(JokeFavorite.class);
+                    favorites.select(favorite.get("jokeId")).where(
+                            cb.equal(favorite.get("jokeId"), root.get("id")),
+                            cb.equal(favorite.get("userId"), viewerId));
+                    predicates.add(cb.exists(favorites));
+                }
+            }
             predicates.add(cb.equal(root.get("status"), JokeStatus.APPROVED));
             predicates.add(cb.isNull(root.get("deletedAt")));
             if (categoryIds != null && !categoryIds.isEmpty()) {

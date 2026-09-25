@@ -23,6 +23,7 @@ const TINTS = ['var(--color-accent-700)', 'var(--color-accent-600)', 'var(--colo
         <a class="pill" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
         <a class="pill" routerLink="/wallet" aria-label="Gnöcken"><mat-icon>toll</mat-icon>{{ auth.me()?.balance ?? 0 }}</a>
       }
+      <a class="gn-icon-btn" [routerLink]="auth.isLoggedIn() ? '/me' : '/auth/login'" [attr.aria-label]="t.nav.me"><mat-icon>account_circle</mat-icon></a>
     </gn-page-header>
     <section class="page">
       @if (!stickers().length) { <div class="gn-empty">{{ t.market.empty }}</div> }

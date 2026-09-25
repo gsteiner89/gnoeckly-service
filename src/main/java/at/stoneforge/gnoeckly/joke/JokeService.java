@@ -58,9 +58,15 @@ public class JokeService {
 
     @Transactional(readOnly = true)
     public PagedResponse<JokeResponse> feed(FeedSort sort, Period period, Collection<UUID> categoryIds, UUID viewerId, Pageable pageable) {
+        return feed(sort, period, categoryIds, false, viewerId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<JokeResponse> feed(FeedSort sort, Period period, Collection<UUID> categoryIds, boolean favoritesOnly,
+                                            UUID viewerId, Pageable pageable) {
         Instant now = Instant.now();
         Page<Joke> page = jokeRepository.findAll(
-                JokeSpecifications.approvedFeed(categoryIds, period.sinceOrNull(now), sort, now), pageable);
+                JokeSpecifications.approvedFeed(categoryIds, period.sinceOrNull(now), sort, now, favoritesOnly, viewerId), pageable);
         return toPaged(page, viewerId, false);
     }
 

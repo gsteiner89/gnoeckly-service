@@ -5,7 +5,7 @@
 export const T = {
   app: 'Gnöckly',
   currency: 'Gnöcken',
-  nav: { feed: 'Witze', rankings: 'Rangliste', new: 'Neu', market: 'Sticker', challenges: 'Aufgaben', me: 'Ich' },
+  nav: { feed: 'Witze', rankings: 'Rangliste', new: 'Neu', market: 'Sticker', challenges: 'Aufgaben', me: 'Mein Profil' },
   feed: {
     hot: 'Heiß',
     top: 'Top',
@@ -22,6 +22,7 @@ export const T = {
     categoriesN: (n: number) => `${n} Kategorien`,
     periodTitle: 'Zeitraum für Top',
     done: 'Fertig',
+    favorites: 'Nur Favoriten',
     boosted: 'Geboostet',
   },
   joke: {
@@ -143,7 +144,7 @@ export const T = {
     freezeBought: 'Freeze gekauft!',
   },
   me: {
-    title: 'Ich',
+    title: 'Mein Profil',
     karma: 'Karma',
     myJokes: 'Meine Witze',
     collection: 'Sammlung',

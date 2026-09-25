@@ -54,8 +54,11 @@ export class ApiService {
     return this.get<JokeCategory[]>('/api/v1/public/categories');
   }
 
-  feed(sort: FeedSort, period: Period, categoryIds: string[], page: number, size = 20) {
+  feed(sort: FeedSort, period: Period, categoryIds: string[], page: number, favoritesOnly = false, size = 20) {
     let params = new HttpParams().set('sort', sort).set('period', period).set('page', page).set('size', size);
+    if (favoritesOnly) {
+      params = params.set('favoritesOnly', true);
+    }
     if (categoryIds.length) {
       params = params.set('categoryIds', categoryIds.join(','));
     }

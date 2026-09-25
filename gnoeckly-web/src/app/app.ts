@@ -7,7 +7,7 @@ import { NativeService } from './core/native/native.service';
 import { T } from './shared/i18n';
 
 /**
- * App-Shell nach Android-Muster: Inhalt oben, persistente Bottom-Navigation mit sechs Spalten (Neu-Button an dritter Stelle).
+ * App-Shell nach Android-Muster: Inhalt oben, persistente Bottom-Navigation mit fünf Spalten (Neu-Button an dritter Stelle).
  * Die Top-App-Bar gehoert den Seiten selbst (Titel/Back-Arrow variieren), die Bottom-Nav wird auf
  * Auth-Seiten ausgeblendet, damit Formulare den Platz bekommen.
  */
@@ -43,10 +43,6 @@ import { T } from './shared/i18n';
           <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M64 224V40M64 48h128l-24 40 24 40H64" /></svg>
           <span>{{ t.nav.challenges }}</span>
         </a>
-        <a [routerLink]="auth.isLoggedIn() ? '/me' : '/auth/login'" [class.active]="meActive()" (click)="native.tap()">
-          <svg viewBox="0 0 256 256" aria-hidden="true"><circle cx="128" cy="96" r="56" /><path d="M32 216a96 96 0 0 1 192 0" /></svg>
-          <span>{{ t.nav.me }}</span>
-        </a>
       </nav>
     }
   `,
@@ -58,7 +54,7 @@ import { T } from './shared/i18n';
     }
     .gn-nav {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-      display: grid; grid-template-columns: 1fr 1fr 72px 1fr 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr 72px 1fr 1fr;
       height: calc(var(--gn-nav-height) + var(--gn-safe-bottom));
       padding-bottom: var(--gn-safe-bottom);
       background: var(--color-bg);
@@ -92,5 +88,4 @@ export class App {
   );
 
   protected readonly showNav = computed(() => !this.url().split('?')[0].startsWith('/auth/'));
-  protected readonly meActive = computed(() => ['/me', '/wallet'].some((p) => this.url().split('?')[0].startsWith(p)));
 }
