@@ -29,8 +29,8 @@ import { codeOf } from '../../shared/problem-detail';
         <input class="gn-input gn-input--compact" maxlength="120" [ngModel]="title()" (ngModelChange)="title.set($event)" name="title" />
       </label>
       <label class="gn-field">{{ t.submit.text }}
-        <textarea class="gn-input" rows="8" maxlength="2000" required [ngModel]="text()" (ngModelChange)="text.set($event)" name="text"></textarea>
-        <span class="counter">{{ text().length }}/2000</span>
+        <textarea class="gn-input" rows="8" maxlength="500" required [ngModel]="text()" (ngModelChange)="text.set($event)" name="text"></textarea>
+        <span class="counter">{{ text().length }}/500</span>
       </label>
       @if (config(); as c) {
         @if (auth.isSuperAdmin()) {
@@ -52,7 +52,7 @@ import { codeOf } from '../../shared/problem-detail';
     .placeholder { color: var(--color-muted); }
     .counter { align-self: flex-end; font-size: 11px; color: var(--color-muted); }
     .fee { display: flex; align-items: flex-start; gap: 8px; margin: 0; font-size: 13px; color: var(--color-muted); }
-    .fee mat-icon { flex: none; width: 16px; height: 16px; font-size: 16px; color: var(--color-accent); }
+    .fee mat-icon { flex: none; width: 16px; height: 16px; font-size: 16px; color: var(--color-coin); }
     .gn-btn { align-self: flex-start; }
   `,
 })

@@ -147,6 +147,7 @@ export const T = {
     title: 'Mein Profil',
     karma: 'Karma',
     myJokes: 'Meine Witze',
+    userJokes: 'Witze',
     collection: 'Sammlung',
     editProfile: 'Profil bearbeiten',
     bio: 'Über mich',

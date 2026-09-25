@@ -85,6 +85,10 @@ export class ApiService {
     return this.get<Sticker[]>('/api/v1/public/stickers');
   }
 
+  userJokes(userId: string, page = 0) {
+    return this.get<PagedResponse<Joke>>(`/api/v1/public/users/${userId}/jokes`, new HttpParams().set('page', page));
+  }
+
   publicProfile(userId: string) {
     return this.get<PublicProfile>(`/api/v1/public/users/${userId}/profile`);
   }

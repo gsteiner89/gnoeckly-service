@@ -28,6 +28,9 @@ public interface JokeRepository extends JpaRepository<Joke, UUID>, JpaSpecificat
 
     Page<Joke> findByAuthorIdAndDeletedAtIsNullOrderByCreatedAtDesc(UUID authorId, Pageable pageable);
 
+    /** Oeffentliche Witze eines Autors (Profil): nur freigegeben, bester Score zuerst, bei Gleichstand neueste Freigabe. */
+    Page<Joke> findByAuthorIdAndStatusAndDeletedAtIsNullOrderByScoreDescApprovedAtDescIdAsc(UUID authorId, JokeStatus status, Pageable pageable);
+
     /** Moderations-Queue: aelteste Einreichung zuerst. */
     Page<Joke> findByStatusAndDeletedAtIsNullOrderByCreatedAtAsc(JokeStatus status, Pageable pageable);
 

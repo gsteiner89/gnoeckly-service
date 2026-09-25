@@ -1,7 +1,7 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api/api.service';
 import { FeedSort, Joke, JokeCategory, Period } from '../../core/api/models';
 import { AuthService } from '../../core/auth/auth.service';
@@ -12,29 +12,37 @@ import { JokeCard } from '../../shared/joke-card';
 import { PageHeader } from '../../shared/page-header';
 import { PullToRefreshDirective } from '../../shared/pull-to-refresh.directive';
 
+/** Merkt sich den Feed beim Verlassen, damit "Zurueck" aus dem Witz-Detail Liste, Filter und Scroll-Position wiederherstellt. */
+@Injectable({ providedIn: 'root' })
+class FeedMemory {
+  snapshot: { sort: FeedSort; period: Period; categoryIds: string[]; favoritesOnly: boolean; jokes: Joke[]; page: number; hasMore: boolean; scrollY: number } | null = null;
+}
+
 @Component({
   selector: 'gn-feed',
   imports: [MatIconModule, RouterLink, JokeCard, PageHeader, PullToRefreshDirective],
   template: `
     <gn-page-header [title]="t.app">
       @if (auth.isLoggedIn()) {
-        <a class="pill" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
-        <a class="pill" routerLink="/wallet" aria-label="Gnöcken"><mat-icon>toll</mat-icon>{{ auth.me()?.balance ?? 0 }}</a>
+        <a class="pill fire" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
+        <a class="pill coin" routerLink="/wallet" aria-label="Gnöcken"><mat-icon>toll</mat-icon>{{ auth.me()?.balance ?? 0 }}</a>
       }
       <a class="gn-icon-btn" [routerLink]="auth.isLoggedIn() ? '/me' : '/auth/login'" [attr.aria-label]="t.nav.me"><mat-icon>account_circle</mat-icon></a>
     </gn-page-header>
 
-    <div class="filters">
-      <div class="segment" role="group">
-        <button type="button" [class.on]="sort() === 'HOT'" (click)="sort.set('HOT')"><mat-icon>local_fire_department</mat-icon>{{ t.feed.hot }}</button>
-        <button type="button" [class.on]="sort() === 'TOP'" (click)="sort.set('TOP')"><mat-icon>trending_up</mat-icon>{{ t.feed.top }}</button>
-        <button type="button" [class.on]="sort() === 'NEW'" (click)="sort.set('NEW')"><mat-icon>schedule</mat-icon>{{ t.feed.new }}</button>
+    <div class="filters-bar">
+      <div class="filters">
+        <div class="segment" role="group">
+          <button type="button" [class.on]="sort() === 'HOT'" (click)="sort.set('HOT')"><mat-icon>local_fire_department</mat-icon>{{ t.feed.hot }}</button>
+          <button type="button" [class.on]="sort() === 'TOP'" (click)="sort.set('TOP')"><mat-icon>trending_up</mat-icon>{{ t.feed.top }}</button>
+          <button type="button" [class.on]="sort() === 'NEW'" (click)="sort.set('NEW')"><mat-icon>schedule</mat-icon>{{ t.feed.new }}</button>
+        </div>
+        <span class="gn-spacer"></span>
+        <button type="button" class="filter" [class.active]="filterActive()" (click)="openFilter()">
+          <svg viewBox="0 0 256 256" width="16" height="16" aria-hidden="true"><path d="M40 60h176l-68 80v56l-40 20v-76Z" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round" /></svg>
+          <span class="filter__label">{{ filterLabel() }}</span>
+        </button>
       </div>
-      <span class="gn-spacer"></span>
-      <button type="button" class="filter" [class.active]="filterActive()" (click)="openFilter()">
-        <svg viewBox="0 0 256 256" width="16" height="16" aria-hidden="true"><path d="M40 60h176l-68 80v56l-40 20v-76Z" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round" /></svg>
-        <span class="filter__label">{{ filterLabel() }}</span>
-      </button>
     </div>
 
     <section class="list" gnPullToRefresh (refresh)="reload()">
@@ -52,14 +60,21 @@ import { PullToRefreshDirective } from '../../shared/pull-to-refresh.directive';
     </section>
   `,
   styles: `
+    :host { display: block; }
     .pill {
       display: inline-flex; align-items: center; gap: 6px; height: 36px; margin-right: 12px; padding: 0 12px;
       border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider);
       color: var(--color-text); font-size: 13px; font-weight: 500; text-decoration: none;
     }
     .pill mat-icon, .segment mat-icon { width: 15px; height: 15px; font-size: 15px; }
-    .pill mat-icon { color: var(--color-accent); }
+    .pill.fire mat-icon { color: var(--color-fire); }
+    .pill.coin mat-icon { color: var(--color-coin); }
 
+    /* Klebt unter der Top-App-Bar (min-height + Safe-Area + 1px Rand), damit der Filter beim Scrollen erreichbar bleibt */
+    .filters-bar {
+      position: sticky; top: calc(var(--gn-header-height) + var(--gn-safe-top) + 1px); z-index: 14;
+      background: var(--color-bg);
+    }
     .filters { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; max-width: 640px; margin: 0 auto; box-sizing: border-box; }
     .segment { display: inline-flex; height: 36px; border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider); }
     .segment button {
@@ -79,15 +94,17 @@ import { PullToRefreshDirective } from '../../shared/pull-to-refresh.directive';
     .filter.active { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
     .filter__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .list { display: flex; flex-direction: column; gap: 10px; padding: 0 12px calc(84px + var(--gn-safe-bottom)); max-width: 640px; margin: 0 auto; box-sizing: border-box; }
+    .list { display: flex; flex-direction: column; gap: 18px; padding: 10px 12px calc(84px + var(--gn-safe-bottom)); max-width: 640px; margin: 0 auto; box-sizing: border-box; }
   `,
 })
-export class FeedPage {
+export class FeedPage implements OnDestroy {
   protected readonly t = T;
   protected readonly auth = inject(AuthService);
   private readonly api = inject(ApiService);
   private readonly toast = inject(ToastService);
   private readonly sheet = inject(MatBottomSheet);
+  private readonly memory = inject(FeedMemory);
+  private readonly router = inject(Router);
 
   readonly sort = signal<FeedSort>('HOT');
   readonly period = signal<Period>('WEEK');
@@ -116,13 +133,40 @@ export class FeedPage {
 
   constructor() {
     void this.api.categories().then((c) => this.categories.set(c)).catch(() => undefined);
+    // Nur bei Browser-/Geraete-Zurueck wiederherstellen; ein Klick auf den Tab "Witze" laedt frisch.
+    const saved = this.router.getCurrentNavigation()?.trigger === 'popstate' ? this.memory.snapshot : null;
+    this.memory.snapshot = null;
+    let restored = false;
+    if (saved) {
+      restored = true;
+      this.sort.set(saved.sort);
+      this.period.set(saved.period);
+      this.categoryIds.set(saved.categoryIds);
+      this.favoritesOnly.set(saved.favoritesOnly);
+      this.jokes.set(saved.jokes);
+      this.hasMore.set(saved.hasMore);
+      this.page = saved.page;
+      // Nach dem ersten Rendern der Liste die Scroll-Position setzen.
+      requestAnimationFrame(() => window.scrollTo({ top: saved.scrollY, behavior: 'instant' }));
+    }
     effect(() => {
       this.sort();
       this.period();
       this.categoryIds();
       this.favoritesOnly();
+      if (restored) {
+        restored = false; // erster Lauf: gemerkten Zustand behalten statt neu zu laden
+        return;
+      }
       untracked(() => void this.reload());
     });
+  }
+
+  ngOnDestroy(): void {
+    this.memory.snapshot = {
+      sort: this.sort(), period: this.period(), categoryIds: this.categoryIds(), favoritesOnly: this.favoritesOnly(),
+      jokes: this.jokes(), page: this.page, hasMore: this.hasMore(), scrollY: window.scrollY,
+    };
   }
 
   openFilter(): void {

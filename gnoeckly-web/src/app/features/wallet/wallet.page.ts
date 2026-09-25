@@ -41,8 +41,8 @@ import { RelativeTimePipe } from '../../shared/pipes';
   `,
   styles: `
     .page { max-width: 640px; margin: 0 auto; padding: 8px 20px calc(84px + var(--gn-safe-bottom)); box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-    .amount { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 44px; line-height: 1.2; font-weight: 500; color: var(--color-accent-300); }
-    .amount mat-icon { width: 36px; height: 36px; font-size: 36px; color: var(--color-accent); }
+    .amount { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 44px; line-height: 1.2; font-weight: 500; color: var(--color-coin); }
+    .amount mat-icon { width: 36px; height: 36px; font-size: 36px; color: var(--color-coin); }
     .divider { align-self: stretch; margin: 20px 0 16px; }
     .tx { align-self: stretch; display: flex; align-items: center; gap: 12px; padding: 8px 0; }
     .icon { flex: none; width: 32px; height: 32px; border-radius: var(--gn-radius); display: grid; place-items: center; background: var(--color-surface); color: var(--color-accent-300); }

@@ -90,7 +90,7 @@ const MILESTONES = [7, 30, 100];
     .page { max-width: 640px; margin: 0 auto; padding: 8px 16px calc(84px + var(--gn-safe-bottom)); box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
     .card { padding: 12px; border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider); display: flex; flex-direction: column; gap: 8px; }
     .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .flame { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 500; color: var(--color-accent-300); }
+    .flame { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 500; color: var(--color-fire); }
     .flame mat-icon, .freeze mat-icon, .done mat-icon { width: 18px; height: 18px; font-size: 18px; }
     .text { font-size: 13px; }
     .center { text-align: center; }
@@ -105,8 +105,8 @@ const MILESTONES = [7, 30, 100];
     .ladder li.next { color: var(--color-text); }
 
     .title { font-size: 14px; }
-    .reward { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: var(--color-accent-300); }
-    .reward mat-icon { width: 16px; height: 16px; font-size: 16px; color: var(--color-accent); }
+    .reward { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: var(--color-coin); }
+    .reward mat-icon { width: 16px; height: 16px; font-size: 16px; color: var(--color-coin); }
     .bar { height: 6px; border-radius: 3px; background: var(--color-surface); overflow: hidden; }
     .fill { height: 100%; background: var(--color-accent); transition: width .3s ease; }
     .quest.claimed { opacity: .6; }

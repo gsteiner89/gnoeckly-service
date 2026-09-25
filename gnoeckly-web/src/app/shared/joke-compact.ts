@@ -16,7 +16,7 @@ import { Joke } from '../core/api/models';
         @if (showAuthor()) { <span class="nick">{{ joke().authorNickname }}</span> }
         @if (joke().categoryName) { <span class="kicker">{{ joke().categoryName }}</span> }
         <span class="gn-spacer"></span>
-        <span class="score" [class.pos]="joke().score > 0">{{ joke().score }}</span>
+        <span class="score" [class.pos]="joke().score > 0" [class.neg]="joke().score < 0">{{ joke().score }}</span>
         @if (unfavoritable()) {
           <button type="button" class="bookmark" aria-label="Aus Favoriten entfernen" (click)="unfavorite.emit(joke())">
             <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path d="M184 224l-56-40-56 40V48a8 8 0 0 1 8-8h96a8 8 0 0 1 8 8Z" fill="currentColor" stroke="currentColor" stroke-width="16" stroke-linejoin="round" /></svg>
@@ -36,10 +36,11 @@ import { Joke } from '../core/api/models';
     }
     .meta { display: flex; align-items: center; gap: 8px; min-height: 24px; margin-top: 8px; font-size: 12px; }
     .nick { color: var(--color-accent-300); font-weight: 500; }
-    .kicker { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); }
+    .kicker { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--color-cat); }
     .score { font-weight: 500; color: var(--color-muted); }
-    .score.pos { color: var(--color-accent-300); }
-    .bookmark { display: grid; place-items: center; width: 28px; height: 28px; margin: -2px -6px -2px 0; border: 0; background: none; color: var(--color-accent); cursor: pointer; }
+    .score.pos { color: var(--color-up); }
+    .score.neg { color: var(--color-down); }
+    .bookmark { display: grid; place-items: center; width: 28px; height: 28px; margin: -2px -6px -2px 0; border: 0; background: none; color: var(--color-coin); cursor: pointer; }
   `,
 })
 export class JokeCompact {

@@ -32,6 +32,20 @@ class JokeFlowIT extends GnoecklyIntegrationTestBase {
     private GnoecklyTestData testData;
 
     @Test
+    void jokeTextIsLimitedTo500Characters() throws Exception {
+        GnoecklyTestData.TestUser author = testData.registerUser();
+        testData.credit(author, 5);
+        for (int length : new int[] {500, 501}) {
+            mockMvc.perform(post("/api/v1/jokes")
+                            .header("Authorization", author.bearer())
+                            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(java.util.Map.of(
+                                    "text", "x".repeat(length), "categoryId", testData.anyCategoryId()))))
+                    .andExpect(status().is(length == 500 ? 201 : 400));
+        }
+    }
+
+    @Test
     void submitDebitsFeeAndStaysHiddenUntilApproved() throws Exception {
         GnoecklyTestData.TestUser author = testData.registerUser();
         assertThat(testData.balance(author)).isEqualTo(100);

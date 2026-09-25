@@ -27,7 +27,7 @@ import { T } from './i18n';
         <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path d="M128 216V40M56 112l72-72 72 72" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
       <span class="score" [class.pos]="joke().score > 0" [class.neg]="joke().score < 0">{{ joke().score }}</span>
-      <button type="button" class="vote" [class.on]="joke().myVote === -1" (click)="vote(-1)" aria-label="Downvote" [disabled]="joke().status !== 'APPROVED'">
+      <button type="button" class="vote down" [class.on]="joke().myVote === -1" (click)="vote(-1)" aria-label="Downvote" [disabled]="joke().status !== 'APPROVED'">
         <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true"><path d="M128 40v176M56 144l72 72 72-72" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
     </div>
@@ -38,15 +38,16 @@ import { T } from './i18n';
     .icon-btn, .vote { display: grid; place-items: center; border: 0; background: none; color: var(--color-muted); cursor: pointer; padding: 0; }
     .icon-btn { width: var(--size); height: var(--size); border-radius: var(--gn-radius); }
     .icon-btn.bordered { box-shadow: inset 0 0 0 1px var(--color-divider); }
-    .icon-btn.on { color: var(--color-accent); }
+    .icon-btn.on { color: var(--color-coin); }
     .votes { display: inline-flex; align-items: center; height: var(--size); border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider); }
     .vote { width: 40px; height: 100%; border-radius: var(--gn-radius); }
-    .vote.on { color: var(--color-accent); }
+    .vote.on { color: var(--color-up); }
+    .vote.down.on { color: var(--color-down); }
     .icon-btn:hover:not(:disabled), .vote:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
     .icon-btn:active:not(:disabled), .vote:active:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
     .vote:disabled { opacity: .45; cursor: default; }
     .score { min-width: 20px; text-align: center; font-size: 13px; font-weight: 500; color: var(--color-muted); }
-    .pos { color: var(--color-accent-300); } .neg { color: var(--color-neutral-500); }
+    .pos { color: var(--color-up); } .neg { color: var(--color-down); }
   `,
   host: { '[class.lg]': 'large()' },
 })

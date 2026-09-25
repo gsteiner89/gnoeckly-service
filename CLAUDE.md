@@ -23,6 +23,11 @@ Repos) und Frontend (`gnoeckly-web/`) liegen wie bei Saga in einem Repo.
 ./gradlew bootRun --args="--spring.profiles.active=dev"
 ```
 
+Im `dev`-Profil legt `DevDataSeeder` (`dev/`, Order 20 nach `GnoecklySeedRunner`) einmalig Testdaten an: fünf Testuser
+`lena|tobi|sarah|max|nina@gnoeckly.test` (Passwort `test1234`, 300 Gnöcken), zwei Extra-Kategorien, 24 freigegebene Witze mit Votes,
+Favoriten (lena) und verliehenen Stickern, dazu offene/abgelehnte Witze für die Moderation. Idempotent über den Testuser `lena`;
+neu erzeugen = DB zurücksetzen. Nie im Standard-/Prod-Profil (`@Profile("dev")`).
+
 Env-Vars zum Start: `GNOECKLY_DB_USER`, `GNOECKLY_DB_PASSWORD` (`GNOECKLY_DB_URL` optional),
 `MIDGARD_JWT_SECRET` (≥ 32 Bytes), `MIDGARD_BOOTSTRAP_ADMIN_EMAIL` + `_PASSWORD` für den
 Superadmin (Tenant, Kategorien und Sticker entstehen auch ohne, siehe Regel 5).

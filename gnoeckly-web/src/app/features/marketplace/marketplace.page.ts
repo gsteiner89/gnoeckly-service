@@ -20,7 +20,7 @@ const TINTS = ['var(--color-accent-700)', 'var(--color-accent-600)', 'var(--colo
   template: `
     <gn-page-header [title]="t.nav.market">
       @if (auth.isLoggedIn()) {
-        <a class="pill" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
+        <a class="pill fire" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
         <a class="pill" routerLink="/wallet" aria-label="Gnöcken"><mat-icon>toll</mat-icon>{{ auth.me()?.balance ?? 0 }}</a>
       }
       <a class="gn-icon-btn" [routerLink]="auth.isLoggedIn() ? '/me' : '/auth/login'" [attr.aria-label]="t.nav.me"><mat-icon>account_circle</mat-icon></a>
@@ -55,7 +55,8 @@ const TINTS = ['var(--color-accent-700)', 'var(--color-accent-600)', 'var(--colo
       border-radius: var(--gn-radius); box-shadow: inset 0 0 0 1px var(--color-divider);
       color: var(--color-text); font-size: 13px; font-weight: 500; text-decoration: none;
     }
-    .pill mat-icon, .buy mat-icon { width: 15px; height: 15px; font-size: 15px; color: var(--color-accent); }
+    .pill mat-icon, .buy mat-icon { width: 15px; height: 15px; font-size: 15px; color: var(--color-coin); }
+    .pill.fire mat-icon { color: var(--color-fire); }
     .page { max-width: 640px; margin: 0 auto; padding: 4px 16px calc(84px + var(--gn-safe-bottom)); box-sizing: border-box; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .item { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: var(--gn-radius); background: var(--color-surface); }

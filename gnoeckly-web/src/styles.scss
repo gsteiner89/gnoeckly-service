@@ -15,13 +15,20 @@ html {
 }
 
 :root {
-  --color-bg: #161826;
-  --color-surface: #232532;
+  --color-bg: #1a1d27;
+  --color-surface: #22252e;
   --color-text: #e9e9ed;
   --color-accent: #9184d9; // nur fuer Linien, Icons, Rahmen, grosse Zahlen – nicht fuer Fliesstext
+  // Semantische Kontrastfarben, damit nicht alles violett ist
+  --color-coin: #f2b544; // Gnoecken, Favoriten-Lesezeichen
+  --color-fire: #ff8a4c; // Streak
+  --color-up: #4cd08a; // Upvote/positiver Score
+  --color-down: #ff5c6c; // Downvote/negativer Score
+  --color-cat: #4fd1c5; // Kategorie-Kicker
   --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
-  --color-muted: color-mix(in srgb, var(--color-text) 55%, transparent);
-  --color-card-header: color-mix(in srgb, var(--color-surface) 45%, var(--color-bg));
+  --color-muted: color-mix(in srgb, var(--color-text) 68%, transparent);
+  // Kopf-/Fussleiste der Witz-Karte: gleiche Flaeche wie der Kartenkoerper, abgesetzt nur durch Trennlinien
+  --color-card-header: var(--color-surface);
 
   --color-neutral-100: #f3f5fe; --color-neutral-200: #e4e7f5; --color-neutral-300: #cfd3e5;
   --color-neutral-400: #b2b6ca; --color-neutral-500: #9397ab; --color-neutral-600: #75798c;
@@ -45,6 +52,7 @@ html {
 @mixin light-tokens {
   color-scheme: light;
   --color-bg: #e4e7f5; --color-surface: #f3f5fe; --color-text: #292b31; --color-accent: #796cbf;
+  --color-coin: #b7791f; --color-fire: #d9581a; --color-up: #1f9d5c; --color-down: #d6293e; --color-cat: #0f8a80;
   --color-divider: color-mix(in srgb, #292b31 16%, transparent);
   --color-accent-300: #5d5294; --color-accent-800: #e7e5fe; --color-accent-100: #2b2741; --color-accent-900: #d2cefd;
   --color-neutral-900: #cfd3e5; --color-neutral-800: #b2b6ca; --color-neutral-100: #292b31;

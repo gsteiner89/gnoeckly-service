@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -58,6 +59,7 @@ import java.util.UUID;
  * eines HTTP-Requests {@link TenantContext} setzen UND den Hibernate-Filter aktivieren.
  */
 @Component
+@Order(10) // vor dem dev-only DevDataSeeder (Order 20)
 @EnableConfigurationProperties(MidgardBootstrapAdminProperties.class)
 public class GnoecklySeedRunner implements ApplicationRunner {
 

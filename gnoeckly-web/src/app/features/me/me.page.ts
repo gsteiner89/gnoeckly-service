@@ -120,7 +120,7 @@ type MeTab = 'jokes' | 'favs' | 'coll';
     .cell + .cell { border-left: 1px solid var(--color-divider); }
     .cell b { font-size: 20px; font-weight: 500; }
     .cell span { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--color-muted); }
-    .coins { display: inline-flex; align-items: center; gap: 6px; color: var(--color-accent-300); }
+    .coins { display: inline-flex; align-items: center; gap: 6px; color: var(--color-coin); }
     .coins mat-icon { width: 18px; height: 18px; font-size: 18px; }
 
     .admin { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px 0; }
@@ -135,7 +135,7 @@ type MeTab = 'jokes' | 'favs' | 'coll';
     .count { min-width: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; font-size: 11px; line-height: 18px; background: var(--color-accent-800); color: var(--color-accent-100); }
 
     .tab { padding: 12px; }
-    .list { display: flex; flex-direction: column; gap: 10px; }
+    .list { display: flex; flex-direction: column; gap: 18px; }
     .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   `,
 })

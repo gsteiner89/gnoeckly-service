@@ -70,6 +70,13 @@ public class JokeService {
         return toPaged(page, viewerId, false);
     }
 
+    /** Alle freigegebenen Witze eines Users fuer sein oeffentliches Profil. */
+    @Transactional(readOnly = true)
+    public PagedResponse<JokeResponse> approvedByAuthor(UUID authorId, UUID viewerId, Pageable pageable) {
+        return toPaged(jokeRepository.findByAuthorIdAndStatusAndDeletedAtIsNullOrderByScoreDescApprovedAtDescIdAsc(
+                authorId, JokeStatus.APPROVED, pageable), viewerId, false);
+    }
+
     @Transactional(readOnly = true)
     public JokeResponse getApproved(UUID id, UUID viewerId) {
         return assembler.assemble(requireApproved(id), viewerId, false);
