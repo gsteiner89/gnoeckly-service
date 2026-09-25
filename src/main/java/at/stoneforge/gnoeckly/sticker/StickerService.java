@@ -5,6 +5,8 @@ import at.stoneforge.gnoeckly.joke.JokeRepository;
 import at.stoneforge.gnoeckly.joke.JokeStatus;
 import at.stoneforge.gnoeckly.profile.UserProfile;
 import at.stoneforge.gnoeckly.profile.UserProfileRepository;
+import at.stoneforge.gnoeckly.push.PushMessage;
+import at.stoneforge.gnoeckly.push.PushService;
 import at.stoneforge.gnoeckly.wallet.CoinTransactionType;
 import at.stoneforge.gnoeckly.wallet.Wallet;
 import at.stoneforge.gnoeckly.wallet.WalletService;
@@ -48,11 +50,12 @@ public class StickerService {
     private final UserProfileRepository profileRepository;
     private final WalletService walletService;
     private final StorageService storageService;
+    private final PushService pushService;
 
     public StickerService(StickerRepository stickerRepository, UserStickerRepository userStickerRepository,
                           JokeStickerRepository jokeStickerRepository, JokeRepository jokeRepository,
                           UserProfileRepository profileRepository, WalletService walletService,
-                          StorageService storageService) {
+                          StorageService storageService, PushService pushService) {
         this.stickerRepository = stickerRepository;
         this.userStickerRepository = userStickerRepository;
         this.jokeStickerRepository = jokeStickerRepository;
@@ -60,6 +63,7 @@ public class StickerService {
         this.profileRepository = profileRepository;
         this.walletService = walletService;
         this.storageService = storageService;
+        this.pushService = pushService;
     }
 
     // --- Katalog -------------------------------------------------------------------------------
@@ -68,7 +72,7 @@ public class StickerService {
     public List<StickerResponse> catalog() {
         Instant now = Instant.now();
         return stickerRepository.findByActiveTrueAndDeletedAtIsNullOrderBySortOrderAscNameAsc().stream()
-                .filter(sticker -> sticker.isAvailableAt(now))
+                .filter(sticker -> sticker.isPurchasable() && sticker.isAvailableAt(now))
                 .map(StickerResponse::from)
                 .toList();
     }
@@ -90,7 +94,7 @@ public class StickerService {
     public PurchaseResponse purchase(UUID stickerId, UUID userId) {
         Sticker sticker = stickerRepository.findForUpdateByIdAndDeletedAtIsNull(stickerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Sticker " + stickerId + " nicht gefunden"));
-        if (!sticker.isAvailableAt(Instant.now())) {
+        if (!sticker.isPurchasable() || !sticker.isAvailableAt(Instant.now())) {
             throw new StickerUnavailableException(StickerUnavailableException.Code.STICKER_UNAVAILABLE);
         }
         if (sticker.isSoldOut()) {
@@ -99,17 +103,32 @@ public class StickerService {
         Wallet wallet = walletService.debit(userId, sticker.getPrice(), CoinTransactionType.STICKER_PURCHASE,
                 sticker.getId(), "Sticker: " + sticker.getName());
         sticker.setStockSold(sticker.getStockSold() + 1);
+        UserSticker owned = addToCollection(userId, sticker);
+        return new PurchaseResponse(toOwned(owned, sticker), wallet.getBalance());
+    }
 
-        UserSticker owned = userStickerRepository.findForUpdateByUserIdAndStickerId(userId, stickerId).orElseGet(() -> {
-            UserSticker created = new UserSticker();
-            created.setUserId(userId);
-            created.setStickerId(stickerId);
-            return created;
-        });
+    /**
+     * Schenkt einem User ein Exemplar ohne Abbuchung (Belohnung, z. B. Streak-Meilenstein). Zaehlt
+     * weder gegen den Bestand noch gilt der Verkaufszeitraum; unbekannter Slug wird ignoriert, damit
+     * eine geloeschte Belohnung keine fachliche Aktion blockiert.
+     */
+    @Transactional
+    public void grant(UUID userId, String stickerSlug) {
+        stickerRepository.findBySlugAndDeletedAtIsNull(stickerSlug)
+                .ifPresent(sticker -> addToCollection(userId, sticker));
+    }
+
+    private UserSticker addToCollection(UUID userId, Sticker sticker) {
+        UserSticker owned = userStickerRepository.findForUpdateByUserIdAndStickerId(userId, sticker.getId())
+                .orElseGet(() -> {
+                    UserSticker created = new UserSticker();
+                    created.setUserId(userId);
+                    created.setStickerId(sticker.getId());
+                    return created;
+                });
         owned.setQuantity(owned.getQuantity() + 1);
         owned.setPurchasedTotal(owned.getPurchasedTotal() + 1);
-        owned = userStickerRepository.save(owned);
-        return new PurchaseResponse(toOwned(owned, sticker), wallet.getBalance());
+        return userStickerRepository.save(owned);
     }
 
     @Transactional(readOnly = true)
@@ -146,6 +165,8 @@ public class StickerService {
         award = jokeStickerRepository.save(award);
         String giverNickname = profileRepository.findByUserIdAndDeletedAtIsNull(giverId)
                 .map(UserProfile::getNickname).orElse("?");
+        pushService.notify(joke.getAuthorId(), new PushMessage("Neuer Sticker für deinen Witz",
+                giverNickname + " hat „" + sticker.getName() + "“ vergeben.", "/joke/" + jokeId));
         return toResponse(award, sticker, giverNickname);
     }
 

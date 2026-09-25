@@ -3,6 +3,9 @@ package at.stoneforge.gnoeckly.vote;
 import at.stoneforge.gnoeckly.joke.Joke;
 import at.stoneforge.gnoeckly.joke.JokeRepository;
 import at.stoneforge.gnoeckly.joke.JokeStatus;
+import at.stoneforge.gnoeckly.push.PushMessage;
+import at.stoneforge.gnoeckly.push.PushService;
+import at.stoneforge.gnoeckly.streak.StreakService;
 import at.stoneforge.midgard.web.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +21,20 @@ import java.util.UUID;
 @Service
 public class VoteService {
 
+    /** Score-Schwellen, bei denen der Autor eine Push-Nachricht bekommt. */
+    static final int[] SCORE_MILESTONES = {10, 50, 100};
+
     private final JokeRepository jokeRepository;
     private final JokeVoteRepository voteRepository;
+    private final StreakService streakService;
+    private final PushService pushService;
 
-    public VoteService(JokeRepository jokeRepository, JokeVoteRepository voteRepository) {
+    public VoteService(JokeRepository jokeRepository, JokeVoteRepository voteRepository,
+                       StreakService streakService, PushService pushService) {
         this.jokeRepository = jokeRepository;
         this.voteRepository = voteRepository;
+        this.streakService = streakService;
+        this.pushService = pushService;
     }
 
     @Transactional
@@ -32,6 +43,7 @@ public class VoteService {
             throw new IllegalArgumentException("Vote muss +1 oder -1 sein");
         }
         Joke joke = requireApproved(jokeId);
+        int scoreBefore = joke.getScore();
         Optional<JokeVote> existing = voteRepository.findByJokeIdAndUserId(jokeId, userId);
         int dUp = 0;
         int dDown = 0;
@@ -59,7 +71,9 @@ public class VoteService {
         }
         if (dUp != 0 || dDown != 0) {
             jokeRepository.applyVoteDelta(joke.getId(), dUp, dDown);
+            notifyOnScoreMilestone(joke, scoreBefore, scoreBefore + dUp - dDown, userId);
         }
+        streakService.touch(userId);
         return current(jokeId, value);
     }
 
@@ -74,6 +88,19 @@ public class VoteService {
             jokeRepository.applyVoteDelta(joke.getId(), oldValue == 1 ? -1 : 0, oldValue == -1 ? -1 : 0);
         }
         return current(jokeId, null);
+    }
+
+    /** Push an den Autor, wenn ein Witz durch diesen Vote erstmals eine Score-Schwelle erreicht. */
+    private void notifyOnScoreMilestone(Joke joke, int before, int after, UUID voterId) {
+        if (joke.getAuthorId().equals(voterId)) {
+            return;
+        }
+        for (int threshold : SCORE_MILESTONES) {
+            if (before < threshold && after >= threshold) {
+                pushService.notify(joke.getAuthorId(), new PushMessage("Dein Witz kommt an",
+                        "Er hat jetzt " + threshold + " Punkte!", "/joke/" + joke.getId()));
+            }
+        }
     }
 
     private VoteResponse current(UUID jokeId, Integer myVote) {

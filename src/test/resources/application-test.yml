@@ -24,6 +24,10 @@ midgard:
       base-path: build/test-storage
 
 gnoeckly:
+  push:
+    # Tests versenden inline (kein Executor) und ohne Erinnerungs-Job; PushIT ruft den Job direkt auf.
+    async: false
+    reminder-cron: "-"
   admob:
     ssv:
       # AdMobSsvIT ueberschreibt den KeyProvider per @Primary-Bean; nie gegen Google im Test.

@@ -40,4 +40,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 13+: Laufzeit-Berechtigung fuer Push-Benachrichtigungen (PushNotifications.requestPermissions). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

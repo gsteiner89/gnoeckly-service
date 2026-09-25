@@ -13,5 +13,8 @@ public interface JokeStickerRepository extends JpaRepository<JokeSticker, UUID> 
     /** Feed-Anreicherung: alle verliehenen Sticker einer Seite in einer Query, Gruppierung im Service. */
     List<JokeSticker> findByJokeIdIn(Collection<UUID> jokeIds);
 
+    /** Daily-Quest "Sticker verleihen". */
+    long countByGiverIdAndCreatedAtGreaterThanEqual(UUID giverId, java.time.Instant since);
+
     Page<JokeSticker> findByJokeIdOrderByCreatedAtDesc(UUID jokeId, Pageable pageable);
 }

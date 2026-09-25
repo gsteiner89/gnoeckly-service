@@ -54,6 +54,18 @@ public class Sticker extends MidgardBaseEntity {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
+    /** {@code false} = reiner Belohnungs-Sticker (z. B. Streak-Meilenstein), nicht im Marktplatz kaeuflich. */
+    @Column(nullable = false)
+    private boolean purchasable = true;
+
+    public boolean isPurchasable() {
+        return purchasable;
+    }
+
+    public void setPurchasable(boolean purchasable) {
+        this.purchasable = purchasable;
+    }
+
     public String getSlug() {
         return slug;
     }

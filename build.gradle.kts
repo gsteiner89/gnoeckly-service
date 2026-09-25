@@ -38,6 +38,9 @@ dependencies {
     // /actuator/health fuer den Hosting-Healthcheck (public-path in application.yml).
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // Server-Push (FCM/APNs) ueber Firebase Admin; nur aktiv mit gnoeckly.push.enabled=true (docs/push-fcm.md).
+    implementation("com.google.firebase:firebase-admin:9.4.3")
+
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

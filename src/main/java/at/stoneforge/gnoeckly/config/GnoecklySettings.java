@@ -45,6 +45,33 @@ public class GnoecklySettings {
         return number(GnoecklySystemOptionDefinitions.WELCOME_COINS);
     }
 
+    public long streakFreezePrice() {
+        return number(GnoecklySystemOptionDefinitions.STREAK_FREEZE_PRICE);
+    }
+
+    public int streakMaxFreezes() {
+        return (int) number(GnoecklySystemOptionDefinitions.STREAK_MAX_FREEZES);
+    }
+
+    /** Belohnung fuer den Meilenstein bei {@code day} Tagen (7, 30 oder 100). */
+    public long streakMilestoneCoins(int day) {
+        return number(switch (day) {
+            case 7 -> GnoecklySystemOptionDefinitions.STREAK_MILESTONE_7_COINS;
+            case 30 -> GnoecklySystemOptionDefinitions.STREAK_MILESTONE_30_COINS;
+            case 100 -> GnoecklySystemOptionDefinitions.STREAK_MILESTONE_100_COINS;
+            default -> throw new IllegalArgumentException("Unbekannter Streak-Meilenstein " + day);
+        });
+    }
+
+    public long questCoins(String questKey) {
+        return number(switch (questKey) {
+            case "VOTE" -> GnoecklySystemOptionDefinitions.QUEST_VOTE_COINS;
+            case "SUBMIT" -> GnoecklySystemOptionDefinitions.QUEST_SUBMIT_COINS;
+            case "AWARD" -> GnoecklySystemOptionDefinitions.QUEST_AWARD_COINS;
+            default -> throw new IllegalArgumentException("Unbekannte Quest " + questKey);
+        });
+    }
+
     private long number(String key) {
         return systemOptionService.list().stream()
                 .filter(option -> option.key().equals(key))

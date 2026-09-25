@@ -62,6 +62,9 @@ HTTP-Flows (Registrierung, Einreichen, Freigabe); nur Gutschriften laufen direkt
 7. **Soft-Delete ist nie automatisch gefiltert** – Repositories filtern `deletedAt` selbst.
    Nie manuell `tenant_id` in Queries (Hibernate-Filter).
 8. **Kein `@Async`/`@Scheduled`** ohne explizites Tenant-Handling (`TenantContext` ist ThreadLocal).
+   Bewusste Ausnahmen mit explizitem Tenant-Handling: `StreakReminderJob` (`@Scheduled`, setzt Default-Tenant +
+   Hibernate-Filter selbst, Muster `GnoecklySeedRunner`) und der Push-Versand (`PushService`: Tokens werden im
+   Request-Thread geladen, der eigene Sende-Thread fasst keine Entities an; `PushTokenCleaner` setzt den Tenant selbst).
    Deshalb: Boost-Ablauf wird zur Query-Zeit ausgewertet, Karma wird aggregiert, kein Job.
 
 ## Fachliche Regeln
@@ -80,12 +83,27 @@ HTTP-Flows (Registrierung, Einreichen, Freigabe); nur Gutschriften laufen direkt
   Hot-Score). Hot-Formel dort und in `JokeService.initialHotScore` synchron halten.
 - **Moderation**: Einreichungen sind `PENDING`; öffentlich sichtbar nur `APPROVED`. Nur der
   Superadmin moderiert (Midgards `Role` ist ungenutzt, kein Moderator-Rollenmodell).
+- **Streak** (`streak/`): aktiv = Vote setzen oder Witz einreichen (`StreakService.touch` in der Transaktion
+  des Aufrufers); Riss/Freeze-Verbrauch werden lazy aus `lastActiveDate` abgeleitet, kein Job. Tageswechsel
+  über den `Clock`-Bean (`gnoeckly.timezone`, Vorgabe `Europe/Vienna`; Tests ersetzen ihn). Meilensteine
+  7/30/100 zahlen Gnöcken (SystemOptions `gnoeckly.streak.*`) und schenken den Sticker `streak-<tag>`
+  (`purchasable=false`, nicht im Marktplatz kaufbar, Slugs im Seed).
+- **Daily Quests** (`quest/`): drei feste Quests (`VOTE` 5 fremde Witze bewerten, `SUBMIT` 1 Einreichung, `AWARD` 1 Sticker
+  verleihen). Fortschritt wird zur Abrufzeit aus den Tagesdaten berechnet (Tagesgrenze über den `Clock`-Bean), nie gespeichert;
+  Einlösen manuell, Idempotenz durch Unique-Index auf `gnoeckly_daily_quest_claim (user, quest, date)`. Belohnungen sind
+  SystemOptions `gnoeckly.quest.*`. Midgards Auditing nutzt die `Clock` nicht (`created_at` = echte Zeit): Tests lassen die
+  `MutableClock` (`TestClockConfiguration`) auf dem heutigen Datum.
+- **Push** (`push/`, `docs/push-fcm.md`): FCM über Firebase Admin, standardmäßig aus (`gnoeckly.push.enabled=false`, `NoopPushSender`).
+  `PushService.notify` lädt Tokens im Aufrufer und versendet nach Commit in eigenem Thread; Versandfehler brechen nie die
+  Fachaktion ab, `UNREGISTERED`-Tokens werden gelöscht. Ereignisse: Freigabe/Ablehnung, Sticker auf Witz, Score-Schwelle
+  10/50/100, Streak-Erinnerung 18:00. Ein Geräte-Token gehört genau einem User (Unique-Index, wird umgehängt).
+  Tests ersetzen den Sender durch `RecordingPushSender` (`TestSupportConfiguration`), `gnoeckly.push.async=false`.
 - **Sticker-Bilder** liegen in Midgards `StorageService` (Namespace `stickers`, ≤ 512 KB) und
   werden über `/api/v1/public/stickers/{id}/image` mit Cache-Headern gestreamt.
 - **Fehlerformat** RFC 7807 mit `code` (midgard Regel 12). Eigene Codes in
   `GnoecklyExceptionHandler` (nicht von `ResponseEntityExceptionHandler` ableiten – Kollision mit
   Midgards Handler): `INSUFFICIENT_COINS`, `NICKNAME_TAKEN`, `EMAIL_TAKEN`, `STICKER_SOLD_OUT`,
-  `STICKER_UNAVAILABLE`, `STICKER_NOT_OWNED`.
+  `STICKER_UNAVAILABLE`, `STICKER_NOT_OWNED`, `STREAK_FREEZE_LIMIT`, `QUEST_ALREADY_CLAIMED`, `QUEST_NOT_COMPLETED`.
 
 ## Bekannte Stolpersteine
 

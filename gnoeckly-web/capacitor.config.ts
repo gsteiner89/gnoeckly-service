@@ -17,6 +17,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#5B3DF5',
       androidScaleType: 'CENTER_CROP',
     },
+    PushNotifications: {
+      // iOS: Nachrichten auch im Vordergrund anzeigen; Android zeigt sie im Vordergrund ueber den toast.
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
     StatusBar: {
       style: 'DARK',
       backgroundColor: '#5B3DF5',

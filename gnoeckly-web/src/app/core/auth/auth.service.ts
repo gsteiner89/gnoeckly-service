@@ -20,6 +20,9 @@ export class AuthService {
   readonly isLoggedIn = computed(() => this.me() !== null);
   readonly isSuperAdmin = computed(() => this.me()?.superAdmin === true);
 
+  /** Vor dem Logout auszufuehrende Aufraeumarbeiten (z. B. Push-Token abmelden); laufen, solange der Access-Token noch gilt. */
+  readonly logoutHooks: Array<() => Promise<void>> = [];
+
   private refreshInFlight: Promise<boolean> | null = null;
 
   /** App-Start: Refresh-Token laden, still erneuern, Profil holen. Fehler = ausgeloggt bleiben. */
@@ -47,6 +50,7 @@ export class AuthService {
   }
 
   async logout(navigate = true): Promise<void> {
+    await Promise.allSettled(this.logoutHooks.map((hook) => hook()));
     await this.tokens.clear();
     this.me.set(null);
     if (navigate) {

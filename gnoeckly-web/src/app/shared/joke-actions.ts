@@ -79,6 +79,9 @@ export class JokeActions {
     try {
       const result = remove ? await this.api.removeVote(current.id) : await this.api.vote(current.id, value);
       this.changed.emit({ ...optimistic, upvotes: result.upvotes, downvotes: result.downvotes, score: result.score, myVote: result.myVote });
+      if (!remove && this.auth.me()?.streak.state !== 'ACTIVE_TODAY') {
+        void this.auth.reloadMe();
+      }
     } catch (error) {
       this.changed.emit(current);
       this.toast.error(error);

@@ -17,6 +17,34 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
+export interface Quest {
+  key: string;
+  target: number;
+  progress: number;
+  reward: number;
+  claimed: boolean;
+  claimable: boolean;
+}
+
+export interface QuestResponse {
+  date: string;
+  quests: Quest[];
+}
+
+export type StreakState = 'NONE' | 'ACTIVE_TODAY' | 'AT_RISK' | 'BROKEN';
+
+export interface StreakInfo {
+  current: number;
+  longest: number;
+  freezes: number;
+  maxFreezes: number;
+  freezePrice: number;
+  lastActiveDate: string | null;
+  state: StreakState;
+  nextMilestone: number | null;
+  nextMilestoneCoins: number | null;
+}
+
 export interface MeResponse {
   userId: string;
   email: string;
@@ -25,6 +53,7 @@ export interface MeResponse {
   superAdmin: boolean;
   balance: number;
   karma: number;
+  streak: StreakInfo;
 }
 
 export interface PublicConfig {
@@ -107,7 +136,10 @@ export type CoinTransactionType =
   | 'STICKER_PURCHASE'
   | 'JOKE_APPROVED'
   | 'WELCOME'
-  | 'ADMIN_ADJUSTMENT';
+  | 'ADMIN_ADJUSTMENT'
+  | 'STREAK_REWARD'
+  | 'STREAK_FREEZE'
+  | 'DAILY_QUEST';
 
 export interface CoinTransaction {
   id: string;
@@ -133,6 +165,7 @@ export interface Sticker {
   availableFrom: string | null;
   availableUntil: string | null;
   sortOrder: number;
+  purchasable: boolean;
 }
 
 export interface OwnedSticker {

@@ -256,11 +256,16 @@ public class GnoecklySeedRunner implements ApplicationRunner {
     }
 
     private void seedStickers() {
-        createStickerIfMissing("lachtraene", "Lachträne", "Für Witze, bei denen die Tränen kullern.", 30, 10);
-        createStickerIfMissing("goldene-pointe", "Goldene Pointe", "Die Auszeichnung für eine perfekte Pointe.", 100, 20);
+        createStickerIfMissing("lachtraene", "Lachträne", "Für Witze, bei denen die Tränen kullern.", 30, 10, true);
+        createStickerIfMissing("goldene-pointe", "Goldene Pointe", "Die Auszeichnung für eine perfekte Pointe.", 100, 20, true);
+        // Belohnungs-Sticker der Streak-Meilensteine (Slugs muessen zu StreakService.MILESTONES passen).
+        createStickerIfMissing("streak-7", "Wochen-Flamme", "Sieben Tage in Folge dabei.", 0, 100, false);
+        createStickerIfMissing("streak-30", "Monats-Flamme", "Dreißig Tage in Folge dabei.", 0, 110, false);
+        createStickerIfMissing("streak-100", "Ewige Flamme", "Hundert Tage in Folge dabei.", 0, 120, false);
     }
 
-    private void createStickerIfMissing(String slug, String name, String description, long price, int sortOrder) {
+    private void createStickerIfMissing(String slug, String name, String description, long price, int sortOrder,
+                                        boolean purchasable) {
         if (stickerRepository.findBySlugAndDeletedAtIsNull(slug).isPresent()) {
             return;
         }
@@ -270,6 +275,7 @@ public class GnoecklySeedRunner implements ApplicationRunner {
         sticker.setDescription(description);
         sticker.setPrice(price);
         sticker.setActive(true);
+        sticker.setPurchasable(purchasable);
         sticker.setSortOrder(sortOrder);
         stickerRepository.save(sticker);
     }

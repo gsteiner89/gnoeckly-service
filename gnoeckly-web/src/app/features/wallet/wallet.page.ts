@@ -93,6 +93,9 @@ export class WalletPage {
       case 'STICKER_PURCHASE': return 'storefront';
       case 'JOKE_APPROVED': return 'verified';
       case 'WELCOME': return 'celebration';
+      case 'STREAK_REWARD': return 'local_fire_department';
+      case 'STREAK_FREEZE': return 'ac_unit';
+      case 'DAILY_QUEST': return 'task_alt';
       default: return 'tune';
     }
   }

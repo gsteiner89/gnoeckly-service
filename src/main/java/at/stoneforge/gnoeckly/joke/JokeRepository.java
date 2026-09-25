@@ -23,6 +23,9 @@ public interface JokeRepository extends JpaRepository<Joke, UUID>, JpaSpecificat
 
     Optional<Joke> findByIdAndDeletedAtIsNull(UUID id);
 
+    /** Daily-Quest "Einreichen": alle nicht zurueckgezogenen Einreichungen seit {@code since}, egal welcher Status. */
+    long countByAuthorIdAndCreatedAtGreaterThanEqualAndDeletedAtIsNull(UUID authorId, Instant since);
+
     Page<Joke> findByAuthorIdAndDeletedAtIsNullOrderByCreatedAtDesc(UUID authorId, Pageable pageable);
 
     /** Moderations-Queue: aelteste Einreichung zuerst. */

@@ -2,7 +2,9 @@ package at.stoneforge.gnoeckly.web;
 
 import at.stoneforge.gnoeckly.profile.EmailTakenException;
 import at.stoneforge.gnoeckly.profile.NicknameTakenException;
+import at.stoneforge.gnoeckly.quest.QuestException;
 import at.stoneforge.gnoeckly.sticker.StickerUnavailableException;
+import at.stoneforge.gnoeckly.streak.StreakFreezeLimitException;
 import at.stoneforge.gnoeckly.wallet.InsufficientCoinsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -38,6 +40,16 @@ public class GnoecklyExceptionHandler {
 
     @ExceptionHandler(StickerUnavailableException.class)
     public ProblemDetail handleStickerUnavailable(StickerUnavailableException exception) {
+        return problemDetail(HttpStatus.CONFLICT, exception.getCode().name(), exception.getMessage());
+    }
+
+    @ExceptionHandler(StreakFreezeLimitException.class)
+    public ProblemDetail handleStreakFreezeLimit(StreakFreezeLimitException exception) {
+        return problemDetail(HttpStatus.CONFLICT, "STREAK_FREEZE_LIMIT", exception.getMessage());
+    }
+
+    @ExceptionHandler(QuestException.class)
+    public ProblemDetail handleQuest(QuestException exception) {
         return problemDetail(HttpStatus.CONFLICT, exception.getCode().name(), exception.getMessage());
     }
 

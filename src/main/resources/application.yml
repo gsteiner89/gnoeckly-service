@@ -60,6 +60,14 @@ midgard:
       base-path: ${GNOECKLY_STORAGE_PATH:./data/storage}
 
 gnoeckly:
+  # Tageswechsel fuer Streak und Daily Quests.
+  timezone: Europe/Vienna
+  push:
+    # Echter FCM-Versand nur mit enabled=true und Service-Account-JSON (docs/push-fcm.md).
+    enabled: ${GNOECKLY_PUSH_ENABLED:false}
+    credentials-path: ${GNOECKLY_FIREBASE_CREDENTIALS:}
+    # Streak-Erinnerung taeglich 18:00 (zone = gnoeckly.timezone); "-" schaltet den Job ab.
+    reminder-cron: "0 0 18 * * *"
   admob:
     ssv:
       verifier-keys-url: https://www.gstatic.com/admob/reward/verifier-keys.json

@@ -18,6 +18,8 @@ import {
   Period,
   PublicConfig,
   PublicProfile,
+  QuestResponse,
+  StreakInfo,
   PurchaseResponse,
   Sticker,
   VoteResponse,
@@ -109,6 +111,22 @@ export class ApiService {
     return this.get<OwnedSticker[]>('/api/v1/me/stickers');
   }
 
+  streak() {
+    return this.get<StreakInfo>('/api/v1/me/streak');
+  }
+
+  buyStreakFreeze() {
+    return this.post<StreakInfo>('/api/v1/me/streak/freeze', {});
+  }
+
+  quests() {
+    return this.get<QuestResponse>('/api/v1/me/quests');
+  }
+
+  claimQuest(key: string) {
+    return this.post<QuestResponse>(`/api/v1/me/quests/${key}/claim`, {});
+  }
+
   wallet() {
     return this.get<Wallet>('/api/v1/me/wallet');
   }
@@ -132,6 +150,14 @@ export class ApiService {
 
   favorite(jokeId: string) {
     return firstValueFrom(this.http.post<void>(`${this.baseUrl}/api/v1/jokes/${jokeId}/favorite`, null));
+  }
+
+  registerPushToken(token: string, platform: 'ANDROID' | 'IOS') {
+    return this.post<void>('/api/v1/me/push-tokens', { token, platform });
+  }
+
+  unregisterPushToken(token: string) {
+    return firstValueFrom(this.http.delete<void>(`${this.baseUrl}/api/v1/me/push-tokens`, { params: new HttpParams().set('token', token) }));
   }
 
   unfavorite(jokeId: string) {

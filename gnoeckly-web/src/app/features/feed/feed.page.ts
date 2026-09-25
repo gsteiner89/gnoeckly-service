@@ -18,6 +18,7 @@ import { PullToRefreshDirective } from '../../shared/pull-to-refresh.directive';
   template: `
     <gn-page-header [title]="t.app">
       @if (auth.isLoggedIn()) {
+        <a class="pill" routerLink="/challenges" aria-label="Serie"><mat-icon>local_fire_department</mat-icon>{{ auth.me()?.streak?.current ?? 0 }}</a>
         <a class="pill" routerLink="/wallet" aria-label="Gnöcken"><mat-icon>toll</mat-icon>{{ auth.me()?.balance ?? 0 }}</a>
       }
     </gn-page-header>

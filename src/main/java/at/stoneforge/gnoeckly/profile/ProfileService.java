@@ -3,6 +3,7 @@ package at.stoneforge.gnoeckly.profile;
 import at.stoneforge.gnoeckly.joke.JokeRepository;
 import at.stoneforge.gnoeckly.joke.JokeStatus;
 import at.stoneforge.gnoeckly.sticker.StickerService;
+import at.stoneforge.gnoeckly.streak.StreakService;
 import at.stoneforge.gnoeckly.wallet.WalletService;
 import at.stoneforge.midgard.user.User;
 import at.stoneforge.midgard.user.UserRepository;
@@ -24,14 +25,17 @@ public class ProfileService {
     private final JokeRepository jokeRepository;
     private final WalletService walletService;
     private final StickerService stickerService;
+    private final StreakService streakService;
 
     public ProfileService(UserProfileRepository profileRepository, UserRepository userRepository,
-                          JokeRepository jokeRepository, WalletService walletService, StickerService stickerService) {
+                          JokeRepository jokeRepository, WalletService walletService, StickerService stickerService,
+                          StreakService streakService) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.jokeRepository = jokeRepository;
         this.walletService = walletService;
         this.stickerService = stickerService;
+        this.streakService = streakService;
     }
 
     @Transactional(readOnly = true)
@@ -40,7 +44,8 @@ public class ProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException("User nicht gefunden"));
         UserProfile profile = requireProfile(userId);
         return new MeResponse(userId, user.getEmail(), profile.getNickname(), profile.getBio(), user.isSuperAdmin(),
-                walletService.get(userId).getBalance(), jokeRepository.karmaOf(userId));
+                walletService.get(userId).getBalance(), jokeRepository.karmaOf(userId),
+                streakService.view(userId));
     }
 
     @Transactional

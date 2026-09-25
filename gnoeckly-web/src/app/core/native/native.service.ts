@@ -10,7 +10,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { ToastService } from '../ui/toast.service';
 import { T } from '../../shared/i18n';
 
-const ROOT_ROUTES = ['/', '/feed', '/rankings', '/market', '/me'];
+const ROOT_ROUTES = ['/', '/feed', '/rankings', '/market', '/challenges', '/me'];
 
 /**
  * Android-typisches Verhalten: Hardware-Back-Button navigiert zurueck, auf einer Root-Seite

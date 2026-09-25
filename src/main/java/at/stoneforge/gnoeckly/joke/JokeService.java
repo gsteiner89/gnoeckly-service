@@ -4,6 +4,9 @@ import at.stoneforge.gnoeckly.category.JokeCategory;
 import at.stoneforge.gnoeckly.category.JokeCategoryService;
 import at.stoneforge.gnoeckly.config.GnoecklySettings;
 import at.stoneforge.gnoeckly.profile.ProfileService;
+import at.stoneforge.gnoeckly.push.PushMessage;
+import at.stoneforge.gnoeckly.push.PushService;
+import at.stoneforge.gnoeckly.streak.StreakService;
 import at.stoneforge.gnoeckly.wallet.CoinTransactionType;
 import at.stoneforge.gnoeckly.wallet.WalletService;
 import at.stoneforge.midgard.web.PagedResponse;
@@ -33,10 +36,13 @@ public class JokeService {
     private final GnoecklySettings settings;
     private final JokeResponseAssembler assembler;
     private final ProfileService profileService;
+    private final StreakService streakService;
+    private final PushService pushService;
 
     public JokeService(JokeRepository jokeRepository, JokeReportRepository reportRepository,
                        JokeCategoryService categoryService, WalletService walletService, GnoecklySettings settings,
-                       JokeResponseAssembler assembler, ProfileService profileService) {
+                       JokeResponseAssembler assembler, ProfileService profileService,
+                       StreakService streakService, PushService pushService) {
         this.jokeRepository = jokeRepository;
         this.reportRepository = reportRepository;
         this.categoryService = categoryService;
@@ -44,6 +50,8 @@ public class JokeService {
         this.settings = settings;
         this.assembler = assembler;
         this.profileService = profileService;
+        this.streakService = streakService;
+        this.pushService = pushService;
     }
 
     // --- oeffentlich ----------------------------------------------------------------------------
@@ -80,6 +88,7 @@ public class JokeService {
         joke = jokeRepository.save(joke);
         walletService.debit(authorId, settings.submitFee(), CoinTransactionType.SUBMIT_FEE, joke.getId(),
                 "Einreichung");
+        streakService.touch(authorId);
         return assembler.assemble(joke, authorId, true);
     }
 
@@ -149,6 +158,8 @@ public class JokeService {
         joke.setHotScore(initialHotScore(now));
         walletService.credit(joke.getAuthorId(), settings.coinsPerApprovedJoke(), CoinTransactionType.JOKE_APPROVED,
                 joke.getId(), null, "Witz freigegeben");
+        pushService.notify(joke.getAuthorId(), new PushMessage("Dein Witz ist freigegeben",
+                "Er ist jetzt öffentlich, dazu gibt es " + settings.coinsPerApprovedJoke() + " Gnöcken.", "/me"));
         return assembler.assemble(joke, null, true);
     }
 
@@ -161,6 +172,7 @@ public class JokeService {
         joke.setStatus(JokeStatus.REJECTED);
         joke.setApprovedBy(adminId);
         joke.setRejectionReason(reason.trim());
+        pushService.notify(joke.getAuthorId(), new PushMessage("Dein Witz wurde abgelehnt", reason.trim(), "/me"));
         return assembler.assemble(joke, null, true);
     }
 

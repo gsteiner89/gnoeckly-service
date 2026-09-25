@@ -6,6 +6,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { NativeService } from './core/native/native.service';
+import { PushService } from './core/push/push.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,9 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(async () => {
       const auth = inject(AuthService);
       const native = inject(NativeService);
+      const push = inject(PushService);
       await Promise.all([auth.init(), native.init()]);
+      push.init();
     }),
   ],
 };

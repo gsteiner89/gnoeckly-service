@@ -20,6 +20,11 @@ gnoeckly-web/ios/App/Pods/
 gnoeckly-web/ios/App/build/
 gnoeckly-web/ios/App/App.xcworkspace/xcuserdata/
 
+# Firebase (docs/push-fcm.md): Client-Konfiguration und Service-Account nie einchecken
+gnoeckly-web/android/app/google-services.json
+gnoeckly-web/ios/App/App/GoogleService-Info.plist
+*service-account*.json
+
 # AdMob-SSV-Testschluessel (docs/admob-ssv-lokal.md)
 tools/ssv-private.key
 src/main/resources/admob-test-keys.json

@@ -14,5 +14,11 @@ public enum CoinTransactionType {
     /** Startguthaben bei Registrierung. */
     WELCOME,
     /** Manuelle Korrektur durch den Superadmin. */
-    ADMIN_ADJUSTMENT
+    ADMIN_ADJUSTMENT,
+    /** Belohnung fuer einen Streak-Meilenstein (Tag 7, 30, 100). */
+    STREAK_REWARD,
+    /** Kauf eines Streak-Freezes. */
+    STREAK_FREEZE,
+    /** Belohnung fuer eine eingeloeste Daily Quest. */
+    DAILY_QUEST
 }
